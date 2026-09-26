@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evidence, Not Answers: Why Our VLM Never Made the Final Decision | Eduard Kharaev</title>
+<meta name="description" content="Lessons from a production shelf-recognition pipeline on self-hosted Qwen: why the vision-language model extracts evidence while deterministic rules decide, with real audit numbers.">
+<meta name="author" content="Eduard Kharaev">
+<link rel="canonical" href="https://swd07.github.io/articles/evidence-not-answers/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Evidence, Not Answers: Why Our VLM Never Made the Final Decision | Eduard Kharaev">
+<meta property="og:description" content="Lessons from a production shelf-recognition pipeline on self-hosted Qwen: why the vision-language model extracts evidence while deterministic rules decide, with real audit numbers.">
+<meta property="og:url" content="https://swd07.github.io/articles/evidence-not-answers/">
+<meta property="og:image" content="https://swd07.github.io/assets/evidence-not-answers-banner.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Evidence, Not Answers: Why Our VLM Never Made the Final Decision | Eduard Kharaev">
+<meta name="twitter:description" content="Lessons from a production shelf-recognition pipeline on self-hosted Qwen: why the vision-language model extracts evidence while deterministic rules decide, with real audit numbers.">
+<meta name="twitter:image" content="https://swd07.github.io/assets/evidence-not-answers-banner.jpg">
+<!-- GOOGLE_SITE_VERIFICATION -->
+<style>
+:root{--bg:#ffffff;--fg:#1f2328;--muted:#59636e;--accent:#0f766e;--line:#e5e7eb;--card:#f6f8fa}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1117;--fg:#e6edf3;--muted:#9198a1;--accent:#2dd4bf;--line:#30363d;--card:#161b22}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.7 Georgia,'Times New Roman',serif}
+header.site,footer.site{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px}
+header.site{border-bottom:1px solid var(--line)}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+header.site .wrap{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;flex-wrap:wrap;gap:8px}
+header.site a{color:var(--fg);text-decoration:none;font-weight:600}
+nav a{margin-left:16px;font-weight:400!important;color:var(--muted)!important}
+a{color:var(--accent)}
+h1{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:clamp(28px,6vw,40px);line-height:1.15;margin:40px 0 8px}
+h2{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:24px;line-height:1.3;margin:44px 0 8px}
+.sub{color:var(--muted);font-size:20px;margin:0 0 12px}
+.meta{font-family:system-ui,sans-serif;font-size:14px;color:var(--muted);margin-bottom:24px}
+img.banner{width:100%;height:auto;border-radius:8px;border:1px solid var(--line)}
+li{margin:6px 0}
+hr{border:0;border-top:1px solid var(--line);margin:40px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:16px 0;font-family:system-ui,sans-serif;font-size:16px}
+footer.site{border-top:1px solid var(--line);margin-top:48px;padding:24px 0;color:var(--muted)}
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Evidence, Not Answers: Why Our VLM Never Made the Final Decision", "description": "Lessons from a production shelf-recognition pipeline on self-hosted Qwen: why the vision-language model extracts evidence while deterministic rules decide, with real audit numbers.", "image": "https://swd07.github.io/assets/evidence-not-answers-banner.jpg", "datePublished": "2026-09-29", "author": {"@type": "Person", "name": "Eduard Kharaev", "jobTitle": "Applied AI Engineer", "url": "https://swd07.github.io/", "email": "mailto:haraev87@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Tbilisi", "addressCountry": "GE"}, "sameAs": ["https://github.com/swd07", "https://t.me/Edharaev"], "knowsAbout": ["Applied AI", "Computer Vision", "Vision-Language Models", "Retrieval-Augmented Generation", "LLM Agents", "MLOps", "Self-hosted LLM inference"]}, "mainEntityOfPage": "https://swd07.github.io/articles/evidence-not-answers/", "keywords": "vision-language model, VLM, shelf recognition, retail computer vision, Qwen, GroundingDINO, Qdrant, retrieval, guardrails, shadow mode, production ML, MLOps"}</script>
+</head>
+<body>
+<header class="site"><div class="wrap" style="max-width:720px"><a href="/">Eduard Kharaev</a><nav><a href="/#articles">Articles</a><a href="/#projects">Projects</a><a href="/#contact">Contact</a></nav></div></header>
+<main class="wrap">
+<article>
+<h1>Evidence, Not Answers: Why Our VLM Never Made the Final Decision</h1>
+<p class="sub">Lessons from a production shelf-recognition pipeline built on self-hosted Qwen</p>
+<p class="meta">By <a href="/">Eduard Kharaev</a> · Applied AI Engineer · 9 min read</p>
+<img class="banner" src="/assets/evidence-not-answers-banner.jpg" alt="Shelf recognition pipeline: a vision-language model extracts evidence, deterministic rules make the final decision" width="1672" height="941">
+<p>There is an obvious way to build shelf recognition today: take a photo of a store shelf, send it to a large vision-language model, and ask, "Which products are on this shelf?"</p>
+
+<p>We deliberately did not build it that way.</p>
+
+<p>Over the past year I built a shelf-recognition system for a regional dairy producer and its distribution company. Merchandisers photograph shelves in stores; the system turns each photo into share of shelf, product presence and price data. Everything ran self-hosted on a single NVIDIA H200.</p>
+
+<p>The most important architectural decision we made was this: <b>the vision-language model extracts evidence, but it never makes the final decision.</b> This article explains why, and what we built instead.</p>
+
+<h2>Why we did not "just ask the VLM"</h2>
+
+<p>Our catalog had 1,383 products: 156 of our own and 1,227 from other brands. The hard cases were never "is this yogurt or milk?". The hard cases were siblings:</p>
+
+<ul>
+<li>the same kefir in 450 g and 900 g packs;</li>
+<li>the same product in a canister and in a PET bottle;</li>
+<li>a 930 g canister and a 1900 g canister that look almost identical in a photo;</li>
+<li>our product next to a competitor product with similar colors.</li>
+</ul>
+
+<p>Ask a general-purpose model to name the product, and you will get a name. What you will not get is a reliable signal that it is guessing. That is the problem. For shelf analytics, <b>a confident wrong answer is worse than no answer.</b> If the system counts a competitor product as ours, share-of-shelf numbers go to management and they are wrong. Nobody sees the error, because the number looks fine.</p>
+
+<p>So we designed the system around one rule: every decision must be backed by evidence, and when evidence is weak, the answer is "unknown".</p>
+
+<h2>The pipeline</h2>
+
+<p>Each shelf photo comes from an offline-first Android app and goes through seven steps:</p>
+
+<ol>
+<li><b>Detection.</b> GroundingDINO finds the product boxes.</li>
+<li><b>Reading.</b> Qwen-VL, used as an OCR engine, reads the text on each package: brand, weight, fat percentage, flavor.</li>
+<li><b>Catalog search.</b> Qwen3-Embedding and Qdrant search the product catalog by text.</li>
+<li><b>Visual search.</b> DINOv2 and ArcFace search a gallery of confirmed product crops by image.</li>
+<li><b>Fusion.</b> A deterministic layer combines the signals by fixed rules.</li>
+<li><b>Guardrails.</b> Weak or contradictory evidence is rejected.</li>
+<li><b>Result.</b> An exact SKU, a brand only, or unknown.</li>
+</ol>
+
+<p>In parallel, price tags are detected, read by a VLM and linked to the nearest product box.</p>
+
+<p>A note on terms: below, "OCR" means the text a vision-language model reads from each product crop. We used Qwen-VL as our OCR engine — first Qwen2.5-VL-72B, later Qwen3-VL-32B in FP8 — with EasyOCR as a fallback. Reading text is exactly the kind of narrow task where a VLM is excellent. Deciding which product it is was a different story.</p>
+
+<p>Analysis is asynchronous. A photo takes roughly 10–30 seconds to process, but the merchandiser never waits: the app stores photos locally and uploads them when the network is available. Capture is decoupled from inference.</p>
+
+<h2>Principle 1: The model extracts, the rules decide</h2>
+
+<p>The fusion layer is a short ladder of rules. The rules are checked from top to bottom, and the first one that matches wins:</p>
+
+<ol>
+<li><b>OCR + visual.</b> OCR read a brand, and the nearest visual neighbor has the same brand.</li>
+<li><b>OCR + catalog.</b> OCR read a brand, and the catalog search found a product of that brand.</li>
+<li><b>Brand only, no SKU.</b> OCR read a brand, but nothing confirms it.</li>
+<li><b>Rejected.</b> OCR read only generic words, such as "milk" or "fresh".</li>
+<li><b>Catalog.</b> The catalog search score is 0.55 or higher.</li>
+<li><b>Catalog + visual.</b> Catalog search and visual search agree on the brand.</li>
+<li><b>Visual.</b> Only the visual search is confident.</li>
+<li><b>Weak catalog.</b> There is only a weak catalog match.</li>
+<li><b>Unknown.</b> Nothing matched.</li>
+</ol>
+
+<p>Two details matter here.</p>
+
+<p>First, rule 3: if OCR reads a brand but neither search confirms it, the system returns the brand without a product code. <b>It never returns a product code of a different brand than the one printed on the package.</b></p>
+
+<p>Second, the VLM's own confidence is not used anywhere. In one of our audits we wrote down a blunt note: the model's self-reported confidence was "always high." It was useless as a signal. What the model reads from the package, such as a weight or a brand, can be checked against the catalog. How confident the model feels cannot.</p>
+
+<p>On our golden set — hundreds of field photos, labelled across stores and re-labelled over six months, matched at IoU 0.5 — the full pipeline reached <b>95.8% brand precision and 73.1% SKU precision end to end.</b> We measured brand and SKU separately because they serve different reports: share of shelf needs the brand, assortment analysis needs the exact SKU.</p>
+
+<h2>Principle 2: Solve siblings with specific evidence, not a bigger model</h2>
+
+<p>Every sibling problem got its own small, measurable resolver. Each one uses one piece of evidence the generic pipeline ignores.</p>
+
+<p><b>Weight from the package.</b> The same product family comes in several weights. We read the weight from the crop and "snap" it to the only family member with that weight, within ±5%. On a stratified golden set, the high-confidence gate was correct in <b>27 of 28 cases (96%)</b>. The rule deliberately works only inside one product family: weight cannot tell two different brands apart.</p>
+
+<p><b>Shape of the box.</b> Two canisters, 930 g and 1900 g, look the same in a photo. Our first attempt used the relative height of the box and was no better than a coin flip (AUC 0.53). Then we looked at the width-to-height ratio of the bounding box: the small canister is narrow (median 0.35), the large one is wide (0.49). That single feature gave <b>AUC 0.89–0.90 and 92.4% / 90.8% accuracy</b> on two product families (n = 181). No model training was needed.</p>
+
+<p><b>Package form from the VLM.</b> We asked the VLM one narrow question: what is the package type? On audited results it was correct in 92.7% of cases. But we measured it per package type and kept it only where it was reliable: PET bottles and buckets were at 93% on 401 crops. One package type was switched off after an audit of 313 decisions, and families that include canisters were excluded completely, because the model confused canisters with PET bottles.</p>
+
+<p><b>The price tag: useful, but never a vote on identity.</b> A price tag carries the product name, weight, fat percentage and price, so it is tempting to use it to identify the product. We deliberately did not. In real stores tags are often outdated, or belong to the product that stood there last week. So the tag answers one question only — what does this product cost — and never changes which product the system thinks it is.</p>
+
+<p>The pattern is the same every time: a narrow question, a measured answer, and a scope limited to where the measurement holds.</p>
+
+<h2>Principle 3: "Unknown" needs a reason, and the reason needs a fix</h2>
+
+<p>Returning "unknown" is only useful if you know <i>why</i>. Every unknown box in our system got one of 19 reason codes, and every code pointed to a lever — the thing that would actually fix it. The main groups:</p>
+
+<ul>
+<li><b>OCR empty or unreadable</b> → improve photo quality.</li>
+<li><b>Product not in the catalog</b> → add it to the catalog.</li>
+<li><b>No close visual neighbor</b> → add product crops to the gallery.</li>
+<li><b>Brand known, exact SKU not</b> → needs text evidence, such as weight or flavor.</li>
+<li><b>Guardrail rejected a contradiction</b> → nothing to fix; this is a healthy reject.</li>
+</ul>
+
+<p>This mapping saved us from at least one expensive mistake. Our intuition was that visual unknowns could be fixed by adding more product crops to the gallery. We measured it. When the nearest visual neighbor was very close (distance ≤ 0.20), it gave the right brand 83% of the time, but the right SKU only 49% of the time. At distance 0.20–0.34, it was 42% for the brand and 15% for the SKU.</p>
+
+<p>Siblings look alike; that is the whole problem. More images of similar packages do not separate them. The real lever was text: weight and flavor from OCR. We stopped investing in gallery seeding for this class of errors.</p>
+
+<p>We also learned that a reason code can hide problems. One code, "brand mismatch — healthy reject," looked like the system working correctly. An audit showed that it was also hiding catalog gaps and false rejections. We split it into subclasses so each one pointed to a real fix.</p>
+
+<p>Unknown boxes also went to a review inbox. When a reviewer confirmed a product, the crop was added to the confirmed visual gallery. The system improved on its own failure cases without retraining any model.</p>
+
+<h2>Principle 4: Guardrails can hurt too — ship them in shadow mode first</h2>
+
+<p>Guardrails sound safe. They are not automatically safe.</p>
+
+<p>Our brand-verification guardrail rejects a decision when the brand read by OCR contradicts the assigned product. When we tested its second iteration on every box, it would have removed <b>93% of correct recognitions of our own products.</b> Our own brand name was often misread by OCR, so the guardrail kept "catching" contradictions that were not there. The third iteration added a trusted-skip rule for these cases and reduced the loss to <b>1%</b>.</p>
+
+<p>We caught this before it touched production data, because every risky mechanism in the system had three modes: off, shadow and active. In shadow mode, the new logic runs on real traffic and writes its decision into a separate audit table, next to the live result, without changing anything the business sees. Each mechanism had its own audit table, and rollback was a single switch back to off.</p>
+
+<p>The decision to go from shadow to active was never a feeling. It was a numeric gate, announced before the measurement and recorded in the code with a date.</p>
+
+<h2>Principle 5: Every decision must be explainable</h2>
+
+<p>For every box, the system stored its full decision trail, not only the final SKU:</p>
+
+<ul>
+<li>the box, detector confidence and the OCR text;</li>
+<li>the brand and attributes read from the package;</li>
+<li>the catalog search score and the visual distance;</li>
+<li>the match source — which rule made the decision;</li>
+<li>guardrail verdicts and the reason for any unknown;</li>
+<li>the thresholds that were active at that moment.</li>
+</ul>
+
+<p>When someone asked "why did the system say this is product X?", we could answer in one minute: which signal decided, which rule matched, and which evidence supported it. When the answer was wrong, the box went into the golden set, so the same error could not come back silently.</p>
+
+<h2>What the business got</h2>
+
+<p>Recognition was never the product. The product was data for merchandising and sales management:</p>
+
+<ul>
+<li><b>Share of shelf</b> by brand and store, with low-share stores flagged, plus shelf level (top, eye level, bottom).</li>
+<li><b>Product presence:</b> in how many stores each of our products was actually on the shelf.</li>
+<li><b>Price intelligence</b> from price tags: our price versus competitors by category, and the markup each store put on our products. Each tag was linked to the nearest product box, preferring a tag directly below the product within a fixed radius. Prices then went through an outlier filter, because OCR sometimes read a barcode or a date as a price. One known limitation: if a store puts the wrong tag under a product, the system repeats the store's mistake. Price tags are small, so we cut photos into a 3×3 grid and ran detection on each tile. Recall on price tags went from <b>16% to 65%</b>, at the cost of nine extra detector calls per photo.</li>
+<li><b>Drift-based compliance:</b> each store visit was compared with that store's own history, and stores with a sudden drop in our share or missing key products were flagged first.</li>
+</ul>
+
+<h2>When would I let a VLM decide?</h2>
+
+<p>I am not against VLMs. We used one in production every day. But the question is not "is the model good?". The question is "what happens when it is wrong, and will anyone notice?".</p>
+
+<p>I would let a VLM make the final decision when errors are cheap, visible and easy to correct — for example, a draft description that a human reviews. I would not let it decide when errors are silent and flow into numbers that people trust, like share of shelf, prices or stock.</p>
+
+<p>In those systems, the architecture is the product: narrow questions to the model, evidence you can check, rules you can read, "unknown" with a reason, and every change measured in shadow mode before it goes live.</p>
+
+<hr>
+
+<p><i>The technical case study, with the architecture and runnable examples, is on GitHub: <a href="https://github.com/swd07/retail-shelf-detection">github.com/swd07/retail-shelf-detection</a></i></p>
+
+<p><i>I'm Eduard Kharaev, an applied AI engineer. I build production AI systems: retrieval, computer vision, self-hosted LLMs and agents with strict boundaries. I'm based in Tbilisi and open to new roles. You can reach me at haraev87@gmail.com or on Telegram: @Edharaev.</i></p>
+</article>
+</main>
+<footer class="site"><div class="wrap">© 2026 Eduard Kharaev · Applied AI Engineer · Tbilisi, Georgia · <a href="mailto:haraev87@gmail.com">haraev87@gmail.com</a> · <a href="https://t.me/Edharaev">Telegram</a> · <a href="https://github.com/swd07">GitHub</a></div></footer>
+</body></html>
