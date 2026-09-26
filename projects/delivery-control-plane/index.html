@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Internal Developer Platform &amp; Release Orchestration — case study | Eduard Kharaev</title>
+<meta name="description" content="Delivery control plane for multi-environment releases: repository state, selective cherry-pick promotion, conflict handling, dependency preflight, build and health verification.">
+<meta name="author" content="Eduard Kharaev">
+<link rel="canonical" href="https://swd07.github.io/projects/delivery-control-plane/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Eduard Kharaev">
+<meta property="og:title" content="Internal Developer Platform &amp; Release Orchestration — case study | Eduard Kharaev">
+<meta property="og:description" content="Delivery control plane for multi-environment releases: repository state, selective cherry-pick promotion, conflict handling, dependency preflight, build and health verification.">
+<meta property="og:url" content="https://swd07.github.io/projects/delivery-control-plane/">
+<meta property="og:image" content="https://swd07.github.io/assets/evidence-not-answers-banner.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Internal Developer Platform &amp; Release Orchestration — case study | Eduard Kharaev">
+<meta name="twitter:description" content="Delivery control plane for multi-environment releases: repository state, selective cherry-pick promotion, conflict handling, dependency preflight, build and health verification.">
+<meta name="twitter:image" content="https://swd07.github.io/assets/evidence-not-answers-banner.jpg">
+<meta name="theme-color" content="#0b0f14">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0f14;--bg2:#111820;--fg:#e6edf3;--muted:#9aa6b2;--accent:#2dd4bf;--accent2:#38bdf8;--line:#243140;--card:#121a23;--code:#0f1620}
+@media (prefers-color-scheme:light){:root{--bg:#ffffff;--bg2:#f5f8fa;--fg:#1a2129;--muted:#5b6672;--accent:#0f766e;--accent2:#0369a1;--line:#e3e8ee;--card:#f7f9fb;--code:#f2f5f8}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.65 Inter,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.narrow{max-width:760px}
+header.site{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header.site .wrap{display:flex;justify-content:space-between;align-items:center;height:60px;gap:12px}
+.brand{font-weight:700;color:var(--fg);letter-spacing:-.01em}
+.brand span{color:var(--accent)}
+nav{display:flex;gap:18px;font-size:15px}
+nav a{color:var(--muted)}
+.hero{padding:72px 0 40px;background:radial-gradient(900px 400px at 85% -10%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 70%)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);padding:4px 12px;border-radius:999px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
+.hero h1{font-size:clamp(38px,7vw,64px);line-height:1.05;letter-spacing:-.03em;margin:18px 0 8px}
+.hero .role{font-size:clamp(19px,3vw,24px);color:var(--muted);margin:0 0 20px}
+.hero p.lead{max-width:680px;font-size:18px;margin:0 0 28px}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-block;padding:11px 20px;border-radius:10px;font-weight:600;font-size:15px;border:1px solid var(--line);color:var(--fg);background:var(--card)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#04201c}
+.btn:hover{text-decoration:none;filter:brightness(1.08)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:44px 0 8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.stat b{display:block;font-size:30px;letter-spacing:-.02em;color:var(--fg)}
+.stat span{font-size:14px;color:var(--muted)}
+section{padding:36px 0}
+h2.sec{font-size:28px;letter-spacing:-.02em;margin:0 0 6px}
+p.sec-sub{color:var(--muted);margin:0 0 22px}
+.feature{display:grid;grid-template-columns:1.2fr 1fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;color:var(--fg)}
+.feature:hover{text-decoration:none;border-color:var(--accent)}
+.feature img{width:100%;height:100%;object-fit:cover;display:block}
+.feature .txt{padding:26px}
+.kicker{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:600}
+.feature h3{font-size:24px;line-height:1.25;margin:8px 0 10px;letter-spacing:-.01em}
+.feature p{color:var(--muted);margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;color:var(--fg);transition:border-color .15s,transform .15s}
+.card:hover{text-decoration:none;border-color:var(--accent);transform:translateY(-2px)}
+.card .thumb{height:170px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 30%,var(--bg2)),color-mix(in srgb,var(--accent2) 25%,var(--bg2)));display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card .thumb img{width:100%;height:100%;object-fit:cover;object-position:top}
+.card .thumb .ph{font-size:15px;font-weight:600;color:var(--fg);opacity:.85;padding:0 20px;text-align:center}
+.card .body{padding:18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card h3{font-size:18px;line-height:1.3;margin:0}
+.card p{font-size:15px;color:var(--muted);margin:0;flex:1}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--bg2);border:1px solid var(--line);color:var(--muted)}
+.skills{display:flex;flex-wrap:wrap;gap:8px}
+.skills .tag{font-size:14px;padding:6px 12px}
+.contact{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px}
+footer.site{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:14px;margin-top:30px}
+/* article / project pages */
+.page{padding:40px 0 20px}
+.crumbs{font-size:14px;color:var(--muted);margin-bottom:18px}
+.page h1{font-size:clamp(30px,5.5vw,44px);line-height:1.12;letter-spacing:-.02em;margin:0 0 10px}
+.page .sub{font-size:20px;color:var(--muted);margin:0 0 14px}
+.page .meta{font-size:14px;color:var(--muted);margin-bottom:26px}
+.prose{font-size:18px;line-height:1.75}
+.prose h1{display:none}
+.prose h2{font-size:26px;line-height:1.3;letter-spacing:-.01em;margin:44px 0 10px}
+.prose h3{font-size:21px;margin:32px 0 8px}
+.prose h4{font-size:18px;margin:26px 0 6px}
+.prose img{max-width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.prose blockquote{margin:18px 0;padding:10px 18px;border-left:3px solid var(--accent);background:var(--card);border-radius:0 8px 8px 0;color:var(--muted)}
+.prose code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em;background:var(--code);padding:2px 6px;border-radius:5px}
+.prose pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:14px;line-height:1.55}
+.prose pre code{background:none;padding:0}
+.prose pre.mermaid{background:var(--card);text-align:center}
+.prose table{width:100%;border-collapse:collapse;font-size:15px;display:block;overflow-x:auto}
+.prose th,.prose td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+.prose th{background:var(--card)}
+.prose li{margin:5px 0}
+.prose hr{border:0;border-top:1px solid var(--line);margin:40px 0}
+img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line);margin-bottom:10px}
+.cta{margin:44px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+@media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.feature{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.grid{grid-template-columns:1fr}nav{gap:12px;font-size:14px}.hero{padding-top:44px}.prose{font-size:17px}}
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "Internal Developer Platform & Release Orchestration", "headline": "Internal Developer Platform & Release Orchestration", "description": "Delivery control plane for multi-environment releases: repository state, selective cherry-pick promotion, conflict handling, dependency preflight, build and health verification.", "author": {"@type": "Person", "name": "Eduard Kharaev", "jobTitle": "Applied AI Engineer", "url": "https://swd07.github.io/", "email": "mailto:haraev87@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Tbilisi", "addressCountry": "GE"}, "sameAs": ["https://github.com/swd07", "https://t.me/Edharaev"], "knowsAbout": ["Applied AI", "Computer Vision", "Vision-Language Models", "Retrieval-Augmented Generation", "Vector Search", "LLM Agents", "MLOps", "Self-hosted LLM inference", "vLLM"]}, "url": "https://swd07.github.io/projects/delivery-control-plane/", "image": "https://swd07.github.io/assets/evidence-not-answers-banner.jpg", "dateModified": "2026-09-26"}</script>
+<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";mermaid.initialize({startOnLoad:true,theme:matchMedia("(prefers-color-scheme: dark)").matches?"dark":"default"});</script>
+</head>
+<body>
+<header class="site"><div class="wrap"><a class="brand" href="/">Eduard <span>Kharaev</span></a><nav><a href="/#writing">Writing</a><a href="/#projects">Projects</a><a href="/#contact">Contact</a></nav></div></header>
+<main class="wrap narrow page">
+<div class="crumbs"><a href="/">Home</a> · <a href="/#projects">Projects</a></div>
+<h1>Internal Developer Platform &amp; Release Orchestration</h1>
+<p class="sub">Delivery control plane for multi-environment releases: repository state, selective cherry-pick promotion, conflict handling, dependency preflight, build and health verification.</p>
+<p class="meta">Case study by <a href="/">Eduard Kharaev</a> · <a href="https://github.com/swd07/ai-platform-portfolio/blob/master/projects/developer-delivery-control-plane.md">Source on GitHub</a></p>
+<div class="prose">
+<h1 id="internal-developer-platform--release-orchestration">Internal
+Developer Platform &amp; Release Orchestration</h1>
+<blockquote>
+<p>A private delivery control plane for managing multi-environment
+application releases — combining repository state, diff/commit
+workflows, preview → staging → production promotion, selective
+cherry-pick, build/restart orchestration, conflict handling, dependency
+checks and operational logs.</p>
+</blockquote>
+<blockquote>
+<p><strong>Public case-study note:</strong> production repositories,
+hostnames, filesystem paths, credentials and company-specific deployment
+topology are intentionally removed. The implementation remains
+private.</p>
+</blockquote>
+<h2 id="problem">Problem</h2>
+<p>A growing internal platform was being developed through several
+parallel environments. The release workflow included multiple working
+copies, preview branches, staging, production, frontend builds, process
+restarts and manual Git operations.</p>
+<p>The technical problem was not simply “run <code>git pull</code> from
+a UI”. The real problem was preserving a repeatable delivery path while
+making the current state visible before a risky operation:</p>
+<ul>
+<li>which branch and commit is actually running;</li>
+<li>whether a working copy is ahead or behind its remote;</li>
+<li>what changed relative to staging or production;</li>
+<li>which files are uncommitted;</li>
+<li>which commits should be promoted;</li>
+<li>whether a build will need dependencies that are missing on the
+target;</li>
+<li>whether a merge produced conflicts;</li>
+<li>whether the application restarted successfully after
+deployment.</li>
+</ul>
+<p>The goal was to build an <strong>operator-oriented delivery control
+plane</strong> that reduced routine terminal work without hiding the
+underlying Git state.</p>
+<h2 id="what-i-built">What I built</h2>
+<h3 id="1-repository--environment-state">1. Repository &amp; environment
+state</h3>
+<p>The control plane maintains a configured inventory of production,
+staging, preview and standalone repositories. For each working copy it
+can surface:</p>
+<ul>
+<li>current branch and latest commit;</li>
+<li>ahead / behind state against the tracked remote;</li>
+<li>preview divergence from staging and production;</li>
+<li>uncommitted-file count and detailed working-tree changes;</li>
+<li>PM2 process state;</li>
+<li>lightweight HTTP health state for configured services.</li>
+</ul>
+<p>Remote refs are refreshed before important comparisons so the UI does
+not calculate release state against a stale local <code>origin/*</code>
+reference.</p>
+<h3 id="2-git-workflow-through-the-control-plane">2. Git workflow
+through the control plane</h3>
+<p>The backend wraps the Git operations needed for the actual delivery
+workflow:</p>
+<ul>
+<li>pull and push;</li>
+<li>commit selected files or the full working tree;</li>
+<li>branch-to-branch merge;</li>
+<li>preview → staging promotion;</li>
+<li>staging → production promotion;</li>
+<li>repository and file-level diff inspection;</li>
+<li>commit history and commit-to-HEAD comparison;</li>
+<li>discard/reset operations for recovery.</li>
+</ul>
+<p>The UI therefore acts as a <strong>release workspace</strong>, not
+just a deployment button.</p>
+<h3 id="3-selective-promotion-with-cherry-pick">3. Selective promotion
+with cherry-pick</h3>
+<p>A full branch merge is not always the right production release unit.
+The platform can list commits present in a source environment but absent
+from the target and promote an explicit subset.</p>
+<p>The promotion path is roughly:</p>
+<p><code>preview commit(s) → staging → validated build → production</code></p>
+<p>Selected commit hashes are validated, ordered, cherry-picked one by
+one and pushed to the target branch. Empty/already-present changes are
+handled separately from real conflicts, while a failed pick stops the
+transfer instead of silently continuing with an incomplete release.</p>
+<p>This makes it possible to ship one approved change without dragging
+every unrelated preview change with it.</p>
+<h3 id="4-merge-conflict-workflow">4. Merge-conflict workflow</h3>
+<p>When a merge fails, the backend detects unmerged files and extracts
+conflict information rather than returning only a generic Git error.</p>
+<p>The workflow supports:</p>
+<ul>
+<li>detecting an active merge;</li>
+<li>listing conflicting files;</li>
+<li>extracting <code>ours</code> / <code>theirs</code> content and
+conflict blocks;</li>
+<li>choosing a side for a file;</li>
+<li>completing the merge after resolution;</li>
+<li>aborting the merge if the operator decides not to continue.</li>
+</ul>
+<p>The important design decision is that <strong>a failed merge becomes
+an explicit state in the control plane</strong>, not an invisible
+terminal problem that leaves the repository half-finished.</p>
+<h3 id="5-build-restart--deployment-orchestration">5. Build, restart
+&amp; deployment orchestration</h3>
+<p>Release operations also understand the application runtime.</p>
+<p>The platform can:</p>
+<ul>
+<li>run frontend production builds;</li>
+<li>optionally clear framework build cache;</li>
+<li>distinguish development and production frontend processes;</li>
+<li>restart full services or frontend-only PM2 processes;</li>
+<li>run pull/merge → build → restart as a single deployment
+workflow;</li>
+<li>expose PM2 logs for post-deploy diagnosis.</li>
+</ul>
+<p>Build timeouts are deliberately long enough for real production
+builds rather than assuming that a web application will compile in a few
+seconds.</p>
+<h3 id="6-dependency-preflight">6. Dependency preflight</h3>
+<p>One subtle failure mode is a release whose source code is valid but
+whose target environment is missing a required package.</p>
+<p>Before promotion, the backend can compare incoming application
+dependencies with the target runtime:</p>
+<ul>
+<li>Python requirements are checked against the target virtual
+environment;</li>
+<li>imports in changed frontend files are checked against installed Node
+packages;</li>
+<li>missing dependencies are surfaced before deployment;</li>
+<li>an explicit installation path can resolve the missing set and re-run
+the check.</li>
+</ul>
+<p>This turns “production build failed because a package was missing”
+into a detectable pre-deploy condition.</p>
+<h3 id="7-ai-assisted-commit-messages">7. AI-assisted commit
+messages</h3>
+<p>The panel also integrates a self-hosted Qwen model for one narrow
+developer-experience task: generate a human-readable commit message from
+the current diff.</p>
+<p>The model receives repository status and a bounded diff and is
+prompted to describe <strong>what changed from the user's point of
+view</strong>, avoiding implementation jargon where possible. The
+generated text is only a suggestion; the actual Git operation remains an
+explicit control-plane action.</p>
+<h2 id="release-architecture">Release architecture</h2>
+<pre class="mermaid">flowchart LR
+    DEV[Developer changes] --&gt; PREVIEW[Preview environment]
+
+    PREVIEW --&gt; INSPECT[Repository state + diff]
+    INSPECT --&gt; SELECT{Release scope}
+
+    SELECT --&gt;|Full branch| MERGE[Merge / promote]
+    SELECT --&gt;|Selected commits| PICK[Validated cherry-pick]
+
+    MERGE --&gt; CONFLICT{Conflict?}
+    PICK --&gt; CONFLICT
+
+    CONFLICT --&gt;|Yes| RESOLVE[Resolve or abort]
+    RESOLVE --&gt; INSPECT
+    CONFLICT --&gt;|No| STAGING[Staging environment]
+
+    STAGING --&gt; PREFLIGHT[Dependency preflight]
+    PREFLIGHT --&gt; BUILD[Production build]
+    BUILD --&gt; VERIFY_BUILD{Build passed?}
+
+    VERIFY_BUILD --&gt;|No| STOP[Stop release + inspect logs]
+    VERIFY_BUILD --&gt;|Yes| PROD[Production promotion]
+
+    PROD --&gt; RESTART[PM2 restart]
+    RESTART --&gt; HEALTH[Health + runtime verification]
+    HEALTH --&gt; DONE[Release complete]
+
+    HEALTH --&gt;|Failure| RECOVERY[Logs / reset / recovery]
+
+    QWEN[Self-hosted Qwen] -. commit-message suggestion .-&gt; INSPECT</pre>
+<p>The core idea is <strong>state before action</strong>. Promotion is
+not a single opaque deploy button: repository state is inspected first,
+the release unit is chosen explicitly, target dependencies are checked,
+and a failed merge/build/runtime verification becomes a visible workflow
+state with a recovery path.</p>
+<h3 id="operational-control-layers">Operational control layers</h3>
+<p><code>inspect → diff → select release unit → promote → preflight → build → restart → verify</code></p>
+<p>The control plane joins three kinds of state that are usually split
+across different tools:</p>
+<ul>
+<li><strong>source state</strong> — branches, commits, diffs and
+conflicts;</li>
+<li><strong>release state</strong> — what is approved for
+staging/production and what failed during promotion;</li>
+<li><strong>runtime state</strong> — build result, PM2 process state,
+service health and operational logs.</li>
+</ul>
+<h2 id="safety--failure-handling">Safety &amp; failure handling</h2>
+<p>This type of tool is powerful because it sits directly on the
+delivery path, so the implementation makes operational state explicit
+instead of assuming every command succeeds.</p>
+<p>Examples:</p>
+<ul>
+<li>repositories are selected from configured inventory rather than
+arbitrary filesystem input;</li>
+<li>remote refs are refreshed before divergence checks;</li>
+<li>commit hashes used in selective transfer are format-validated and
+verified as real commits;</li>
+<li>merge and cherry-pick conflicts stop the workflow;</li>
+<li>partially completed operations can be aborted/recovered;</li>
+<li>build failure prevents the following restart stage from being
+reported as a successful deployment;</li>
+<li>dependency checks run against the target environment, not only the
+developer machine.</li>
+</ul>
+<p>The system deliberately does <strong>not</strong> try to replace Git.
+It provides a controlled operational surface on top of Git, with the
+underlying state still visible to the operator.</p>
+<h2 id="why-this-is-more-than-a-devops-dashboard">Why this is more than
+a DevOps dashboard</h2>
+<p>A dashboard tells you that a repository exists or that a process is
+online. This system performs the actual delivery workflow while
+preserving intermediate states:</p>
+<p><code>inspect → diff → commit → promote → preflight → build → restart → verify</code></p>
+<p>It connects software-development state to runtime state, which is the
+reason I treat it as an <strong>internal developer platform / delivery
+control plane</strong> rather than a monitoring UI.</p>
+<h2 id="my-role">My role</h2>
+<p>Designed and built the internal workflow and backend orchestration,
+including repository-state modeling, Git operations, environment
+comparisons, selective promotion, merge-conflict handling, dependency
+preflight, build/restart automation, operational recovery paths and the
+AI-assisted commit message workflow. The operator frontend is a private
+Next.js application connected to the same API.</p>
+<h2 id="stack">Stack</h2>
+<p><code>Python</code> · <code>FastAPI</code> · <code>Git</code> ·
+<code>subprocess</code> · <code>Next.js</code> · <code>TypeScript</code>
+· <code>React</code> · <code>PM2</code> · <code>Linux</code><br />
+<code>npm / Node.js</code> · <code>Python virtualenv / pip</code> ·
+<code>HTTP health checks</code> · <code>self-hosted Qwen</code></p>
+<h2 id="engineering-principles-demonstrated">Engineering principles
+demonstrated</h2>
+<ul>
+<li><strong>State before action:</strong> show branch, diff and
+divergence before promotion.</li>
+<li><strong>Small release units:</strong> selective cherry-pick when a
+full branch merge is too broad.</li>
+<li><strong>Failure as state:</strong> conflicts and build failures are
+first-class workflow states.</li>
+<li><strong>Target-aware preflight:</strong> validate the environment
+that will actually run the release.</li>
+<li><strong>Recovery paths:</strong> abort, reset and discard workflows
+are part of delivery engineering.</li>
+<li><strong>AI as assistance, not authority:</strong> the model can
+draft a commit message; Git state remains deterministic and
+operator-controlled.</li>
+</ul>
+
+</div>
+<div class="cta"><b>Hiring for applied AI, computer vision, RAG or LLM agents?</b><br>I'm based in Tbilisi and open to new roles. Email <a href="mailto:haraev87@gmail.com">haraev87@gmail.com</a> or message me on <a href="https://t.me/Edharaev">Telegram</a>.</div>
+</main>
+<footer class="site"><div class="wrap">© 2026 Eduard Kharaev · Applied AI Engineer · Tbilisi, Georgia · <a href="mailto:haraev87@gmail.com">haraev87@gmail.com</a> · <a href="https://t.me/Edharaev">Telegram</a> · <a href="https://github.com/swd07">GitHub</a></div></footer>
+</body></html>

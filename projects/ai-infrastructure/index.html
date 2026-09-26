@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Infrastructure Control Plane &amp; MCP Gateway — case study | Eduard Kharaev</title>
+<meta name="description" content="Monitoring for GPU, models and services with AI-specific detectors (LLM endpoint drift, silent OCR degradation), an incident assistant and a least-privilege MCP gateway.">
+<meta name="author" content="Eduard Kharaev">
+<link rel="canonical" href="https://swd07.github.io/projects/ai-infrastructure/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Eduard Kharaev">
+<meta property="og:title" content="AI Infrastructure Control Plane &amp; MCP Gateway — case study | Eduard Kharaev">
+<meta property="og:description" content="Monitoring for GPU, models and services with AI-specific detectors (LLM endpoint drift, silent OCR degradation), an incident assistant and a least-privilege MCP gateway.">
+<meta property="og:url" content="https://swd07.github.io/projects/ai-infrastructure/">
+<meta property="og:image" content="https://swd07.github.io/assets/evidence-not-answers-banner.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Infrastructure Control Plane &amp; MCP Gateway — case study | Eduard Kharaev">
+<meta name="twitter:description" content="Monitoring for GPU, models and services with AI-specific detectors (LLM endpoint drift, silent OCR degradation), an incident assistant and a least-privilege MCP gateway.">
+<meta name="twitter:image" content="https://swd07.github.io/assets/evidence-not-answers-banner.jpg">
+<meta name="theme-color" content="#0b0f14">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0f14;--bg2:#111820;--fg:#e6edf3;--muted:#9aa6b2;--accent:#2dd4bf;--accent2:#38bdf8;--line:#243140;--card:#121a23;--code:#0f1620}
+@media (prefers-color-scheme:light){:root{--bg:#ffffff;--bg2:#f5f8fa;--fg:#1a2129;--muted:#5b6672;--accent:#0f766e;--accent2:#0369a1;--line:#e3e8ee;--card:#f7f9fb;--code:#f2f5f8}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.65 Inter,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.narrow{max-width:760px}
+header.site{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header.site .wrap{display:flex;justify-content:space-between;align-items:center;height:60px;gap:12px}
+.brand{font-weight:700;color:var(--fg);letter-spacing:-.01em}
+.brand span{color:var(--accent)}
+nav{display:flex;gap:18px;font-size:15px}
+nav a{color:var(--muted)}
+.hero{padding:72px 0 40px;background:radial-gradient(900px 400px at 85% -10%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 70%)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);padding:4px 12px;border-radius:999px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
+.hero h1{font-size:clamp(38px,7vw,64px);line-height:1.05;letter-spacing:-.03em;margin:18px 0 8px}
+.hero .role{font-size:clamp(19px,3vw,24px);color:var(--muted);margin:0 0 20px}
+.hero p.lead{max-width:680px;font-size:18px;margin:0 0 28px}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-block;padding:11px 20px;border-radius:10px;font-weight:600;font-size:15px;border:1px solid var(--line);color:var(--fg);background:var(--card)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#04201c}
+.btn:hover{text-decoration:none;filter:brightness(1.08)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:44px 0 8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.stat b{display:block;font-size:30px;letter-spacing:-.02em;color:var(--fg)}
+.stat span{font-size:14px;color:var(--muted)}
+section{padding:36px 0}
+h2.sec{font-size:28px;letter-spacing:-.02em;margin:0 0 6px}
+p.sec-sub{color:var(--muted);margin:0 0 22px}
+.feature{display:grid;grid-template-columns:1.2fr 1fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;color:var(--fg)}
+.feature:hover{text-decoration:none;border-color:var(--accent)}
+.feature img{width:100%;height:100%;object-fit:cover;display:block}
+.feature .txt{padding:26px}
+.kicker{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:600}
+.feature h3{font-size:24px;line-height:1.25;margin:8px 0 10px;letter-spacing:-.01em}
+.feature p{color:var(--muted);margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;color:var(--fg);transition:border-color .15s,transform .15s}
+.card:hover{text-decoration:none;border-color:var(--accent);transform:translateY(-2px)}
+.card .thumb{height:170px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 30%,var(--bg2)),color-mix(in srgb,var(--accent2) 25%,var(--bg2)));display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card .thumb img{width:100%;height:100%;object-fit:cover;object-position:top}
+.card .thumb .ph{font-size:15px;font-weight:600;color:var(--fg);opacity:.85;padding:0 20px;text-align:center}
+.card .body{padding:18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card h3{font-size:18px;line-height:1.3;margin:0}
+.card p{font-size:15px;color:var(--muted);margin:0;flex:1}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--bg2);border:1px solid var(--line);color:var(--muted)}
+.skills{display:flex;flex-wrap:wrap;gap:8px}
+.skills .tag{font-size:14px;padding:6px 12px}
+.contact{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px}
+footer.site{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:14px;margin-top:30px}
+/* article / project pages */
+.page{padding:40px 0 20px}
+.crumbs{font-size:14px;color:var(--muted);margin-bottom:18px}
+.page h1{font-size:clamp(30px,5.5vw,44px);line-height:1.12;letter-spacing:-.02em;margin:0 0 10px}
+.page .sub{font-size:20px;color:var(--muted);margin:0 0 14px}
+.page .meta{font-size:14px;color:var(--muted);margin-bottom:26px}
+.prose{font-size:18px;line-height:1.75}
+.prose h1{display:none}
+.prose h2{font-size:26px;line-height:1.3;letter-spacing:-.01em;margin:44px 0 10px}
+.prose h3{font-size:21px;margin:32px 0 8px}
+.prose h4{font-size:18px;margin:26px 0 6px}
+.prose img{max-width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.prose blockquote{margin:18px 0;padding:10px 18px;border-left:3px solid var(--accent);background:var(--card);border-radius:0 8px 8px 0;color:var(--muted)}
+.prose code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em;background:var(--code);padding:2px 6px;border-radius:5px}
+.prose pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:14px;line-height:1.55}
+.prose pre code{background:none;padding:0}
+.prose pre.mermaid{background:var(--card);text-align:center}
+.prose table{width:100%;border-collapse:collapse;font-size:15px;display:block;overflow-x:auto}
+.prose th,.prose td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+.prose th{background:var(--card)}
+.prose li{margin:5px 0}
+.prose hr{border:0;border-top:1px solid var(--line);margin:40px 0}
+img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line);margin-bottom:10px}
+.cta{margin:44px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+@media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.feature{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.grid{grid-template-columns:1fr}nav{gap:12px;font-size:14px}.hero{padding-top:44px}.prose{font-size:17px}}
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "AI Infrastructure Control Plane & MCP Gateway", "headline": "AI Infrastructure Control Plane & MCP Gateway", "description": "Monitoring for GPU, models and services with AI-specific detectors (LLM endpoint drift, silent OCR degradation), an incident assistant and a least-privilege MCP gateway.", "author": {"@type": "Person", "name": "Eduard Kharaev", "jobTitle": "Applied AI Engineer", "url": "https://swd07.github.io/", "email": "mailto:haraev87@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Tbilisi", "addressCountry": "GE"}, "sameAs": ["https://github.com/swd07", "https://t.me/Edharaev"], "knowsAbout": ["Applied AI", "Computer Vision", "Vision-Language Models", "Retrieval-Augmented Generation", "Vector Search", "LLM Agents", "MLOps", "Self-hosted LLM inference", "vLLM"]}, "url": "https://swd07.github.io/projects/ai-infrastructure/", "image": "https://swd07.github.io/assets/evidence-not-answers-banner.jpg", "dateModified": "2026-09-26"}</script>
+<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";mermaid.initialize({startOnLoad:true,theme:matchMedia("(prefers-color-scheme: dark)").matches?"dark":"default"});</script>
+</head>
+<body>
+<header class="site"><div class="wrap"><a class="brand" href="/">Eduard <span>Kharaev</span></a><nav><a href="/#writing">Writing</a><a href="/#projects">Projects</a><a href="/#contact">Contact</a></nav></div></header>
+<main class="wrap narrow page">
+<div class="crumbs"><a href="/">Home</a> · <a href="/#projects">Projects</a></div>
+<h1>AI Infrastructure Control Plane &amp; MCP Gateway</h1>
+<p class="sub">Monitoring for GPU, models and services with AI-specific detectors (LLM endpoint drift, silent OCR degradation), an incident assistant and a least-privilege MCP gateway.</p>
+<p class="meta">Case study by <a href="/">Eduard Kharaev</a> · <a href="https://github.com/swd07/ai-platform-portfolio/blob/master/projects/infra-monitoring-agent.md">Source on GitHub</a></p>
+<div class="prose">
+<h1 id="ai-infrastructure-control-plane--security-operations">AI
+Infrastructure Control Plane &amp; Security Operations</h1>
+<blockquote>
+<p>A self-hosted operations layer for production AI infrastructure —
+combining a web control plane, deterministic AIOps/security detectors,
+AI-model and GPU observability, incident alerting, a tool-calling Qwen
+assistant, and a least-privilege MCP gateway for safe external AI
+access.</p>
+</blockquote>
+<blockquote>
+<p><strong>Public case-study note:</strong> the production repositories
+remain private. Internal IPs, usernames, credentials, hostnames and
+company-specific infrastructure details are intentionally removed
+here.</p>
+</blockquote>
+<h2 id="problem">Problem</h2>
+<p>Operating a growing production AI stack created a problem that
+ordinary uptime checks did not solve. The environment included
+application APIs, web frontends, background workers, databases, object
+and vector storage, GPU inference services, business integrations and
+multiple AI models. A failure could look very different depending on the
+layer:</p>
+<ul>
+<li>a process can be <code>online</code> but stuck;</li>
+<li>an inference endpoint can time out because it is busy rather than
+dead;</li>
+<li>a model can move to a new port while stale configuration still
+points at the old endpoint;</li>
+<li>OCR can remain technically available while silently returning empty
+results;</li>
+<li>a broken deploy can create a PM2 restart storm;</li>
+<li>authentication traffic can turn into brute-force or rate-limit
+abuse;</li>
+<li>an ERP integration can fail while the application itself still looks
+healthy.</li>
+</ul>
+<p>A second problem appeared once AI clients were allowed to inspect
+operations: <strong>how do you expose useful production telemetry to an
+LLM without exposing every internal tool, secret, identity or database
+operation?</strong></p>
+<p>The goal became broader than monitoring: build a <strong>single
+operational control layer</strong> that helps one technical owner
+understand what is running, detect failures early, investigate them with
+real data, and expose only narrowly bounded operational capabilities to
+AI clients.</p>
+<h2 id="what-i-built">What I built</h2>
+<p>The system has five cooperating layers.</p>
+<h3 id="1-operations-control-panel">1. Operations Control Panel</h3>
+<p>A private <strong>Next.js / TypeScript control plane</strong> for
+day-to-day operation of the production stack. It provides dedicated
+views for:</p>
+<ul>
+<li>system health and service latency;</li>
+<li>servers, CPU/RAM/disk and remote-host availability;</li>
+<li>PM2 processes and restart state;</li>
+<li>AI models, inference services and their consumers;</li>
+<li>NVIDIA H200 VRAM, utilization, temperature, power and GPU
+processes;</li>
+<li>databases, logs and network state;</li>
+<li>deployment/project inventory and environment status;</li>
+<li>security telemetry, sessions and audit information;</li>
+<li>operational monitoring for field applications.</li>
+</ul>
+<p>The main dashboards refresh on roughly <strong>10–15 second
+intervals</strong>, while service maintenance state can be explicitly
+marked so planned work is not treated as an incident.</p>
+<h3 id="2-autonomous-security--aiops-watcher">2. Autonomous Security /
+AIOps Watcher</h3>
+<p>A Python watcher runs on a <strong>60-second production loop</strong>
+and evaluates deterministic detectors before anything reaches the LLM
+layer.</p>
+<p>Current detector coverage includes <strong>15+ operational/security
+alert types</strong> across:</p>
+<p><strong>Security</strong></p>
+<ul>
+<li>HTTP authentication brute-force patterns;</li>
+<li>rate-limit / HTTP 429 spikes;</li>
+<li>HTTP 5xx spikes;</li>
+<li>SSH failed-login / brute-force patterns.</li>
+</ul>
+<p><strong>Application &amp; infrastructure</strong></p>
+<ul>
+<li>service-down after consecutive failures;</li>
+<li><code>busy</code> vs <code>stuck</code> service triage;</li>
+<li>PM2 crash-loop / restart-rate spikes;</li>
+<li>abnormal process memory use;</li>
+<li>disk pressure;</li>
+<li>remote-host unreachability;</li>
+<li>PostgreSQL health and query/session anomalies;</li>
+<li>business-integration send failures.</li>
+</ul>
+<p><strong>AI infrastructure</strong></p>
+<ul>
+<li>GPU thermal, VRAM and sustained-power anomalies;</li>
+<li><strong>LLM endpoint drift</strong> — detect a live
+OpenAI-compatible model endpoint that is missing from the configured
+inventory;</li>
+<li><strong>silent OCR degradation</strong> — detect when the service
+stays online but fresh merchandising analyses suddenly contain an
+abnormal share of empty OCR results.</li>
+</ul>
+<h3 id="3-security-monitor">3. Security Monitor</h3>
+<p>The control plane includes a live security console that joins web and
+host telemetry into one view:</p>
+<ul>
+<li>requests, unique IPs, 4xx/5xx/429 rates;</li>
+<li>password brute-force candidates with severity;</li>
+<li>recent SSH accepted/failed events;</li>
+<li>top source IPs;</li>
+<li>live request feed with user/device enrichment;</li>
+<li>response times and HTTP status;</li>
+<li>secret-leak registry with severity and remediation status;</li>
+<li>watcher / incident-bot health.</li>
+</ul>
+<p>This gives the operator a fast path from <strong>alert → evidence →
+affected resource</strong> without starting with SSH and manual log
+tailing.</p>
+<h3 id="4-tool-calling-qwen-incident-assistant">4. Tool-calling Qwen
+Incident Assistant</h3>
+<p>A self-hosted <strong>Qwen</strong> assistant sits next to the
+deterministic monitoring layer. It does not invent system state: for
+concrete questions it calls operational tools and then summarizes the
+returned data.</p>
+<p>The assistant has <strong>20+ tools</strong> spanning security,
+sessions, infrastructure, database health, field operations and business
+integrations. Examples include recent-alert lookup, service health, PM2
+state, disk/system information, suspicious-login analysis, database
+diagnostics and order/integration investigation.</p>
+<p>Tool routing can restrict the model to the subset relevant to the
+current domain, reducing prompt size and unnecessary tool exposure while
+retaining a safe fallback to the full tool set.</p>
+<h3 id="5-secure-mcp-access-layer">5. Secure MCP Access Layer</h3>
+<p>A separate private <strong>MCP server</strong> exposes a deliberately
+smaller read-only surface to trusted local LLM/IDE clients.</p>
+<p>Instead of exporting the whole production tool module, the MCP
+wrapper exposes exactly <strong>7 approved operations</strong>
+covering:</p>
+<ul>
+<li>recent security alerts;</li>
+<li>top attacking/source IPs;</li>
+<li>live brute-force signals;</li>
+<li>SSH events;</li>
+<li>service health;</li>
+<li>disk usage;</li>
+<li>public-IP GeoIP lookup.</li>
+</ul>
+<p>The important part is not the MCP protocol itself; it is the
+<strong>security boundary around tool access</strong>.</p>
+<h4 id="database-level-read-only-enforcement">Database-level read-only
+enforcement</h4>
+<p>The MCP process connects with a role that has only explicitly granted
+<code>SELECT</code> access to the minimum required tables. Write
+prevention therefore comes from PostgreSQL privileges, not from a prompt
+or a convention that “the model should only read”.</p>
+<h4 id="explicit-tool-whitelist">Explicit tool whitelist</h4>
+<p>Sensitive production tools are not dynamically discoverable through
+<code>getattr</code> or arbitrary tool-name dispatch. PII- or
+secret-bearing operations from the broader production module are simply
+not exposed to the MCP server.</p>
+<p>This is enforced as a tested invariant.</p>
+<h4 id="validate-before-execution">Validate before execution</h4>
+<p>Every MCP parameter is validated before the production function is
+called:</p>
+<ul>
+<li>bounded time windows and result limits;</li>
+<li>enum validation;</li>
+<li>public-IP validation;</li>
+<li>SQL remains parameterized in the underlying production code;</li>
+<li>shell execution uses argument lists rather than
+<code>shell=True</code>.</li>
+</ul>
+<h4 id="bounded-output">Bounded output</h4>
+<p>Responses have a configurable byte ceiling (default <strong>24
+KB</strong>). Oversized results are truncated with an explicit marker
+rather than allowing a client to dump large operational datasets into
+model context.</p>
+<h4 id="local-stdio-transport--audit">Local stdio transport + audit</h4>
+<p>The MCP server does <strong>not</strong> listen on a network port. A
+trusted client launches it locally and communicates through stdio.</p>
+<p>Every invocation is written to a JSONL audit trail with timestamp,
+tool, arguments and outcome such as <code>ok</code>,
+<code>truncated</code>, <code>rejected_validation</code> or
+<code>error</code>.</p>
+<p>Backend exceptions are contained instead of leaking full stack traces
+into the model context.</p>
+<h4 id="security-tests">Security tests</h4>
+<p>The MCP wrapper has <strong>19 focused tests</strong> covering the
+access boundary itself, including:</p>
+<ul>
+<li>exact whitelist composition;</li>
+<li>PII/secret tool isolation;</li>
+<li>numeric and enum bounds;</li>
+<li>negative IP-validation cases;</li>
+<li>output truncation;</li>
+<li>backend error containment;</li>
+<li>audit completeness;</li>
+<li>resilience when audit logging itself fails.</li>
+</ul>
+<p>This turns “safe tool calling” from a prompt instruction into
+something closer to an enforceable software boundary.</p>
+<h2 id="architecture">Architecture</h2>
+<pre class="mermaid">flowchart LR
+    A[Production services] --&gt; B[Health / process / GPU probes]
+    C[Nginx + SSH logs] --&gt; D[Security detectors]
+    E[PostgreSQL + integrations] --&gt; F[DB / business detectors]
+    G[AI inference + OCR outputs] --&gt; H[AI-specific detectors]
+
+    B --&gt; I[Autonomous watcher · 60s]
+    D --&gt; I
+    F --&gt; I
+    H --&gt; I
+
+    I --&gt; J[Dedup + consecutive-failure gates]
+    J --&gt; K[Incident log]
+    J --&gt; L[Mobile chat alerts]
+
+    K --&gt; M[Next.js Control Panel]
+    B --&gt; M
+    C --&gt; M
+
+    N[Self-hosted Qwen assistant] --&gt; O[20+ operational tools]
+    O --&gt; B
+    O --&gt; C
+    O --&gt; E
+    N --&gt; L
+
+    P[Trusted IDE / LLM client] --&gt; Q[MCP over stdio]
+    Q --&gt; R[7-tool explicit whitelist]
+    R --&gt; S[Validation + output cap + audit]
+    S --&gt; T[PostgreSQL RO / logs / health probes]</pre>
+<p>The important design choice is that <strong>LLM reasoning is
+downstream of deterministic observation</strong>, and external AI access
+receives a smaller capability surface than the internal incident
+assistant.</p>
+<p>Rules decide that something measurable happened; models help
+investigate and explain it. Access control remains in software and
+infrastructure layers rather than in natural-language instructions.</p>
+<h2 id="alert-quality-engineering">Alert-quality engineering</h2>
+<p>Monitoring that fires constantly becomes useless, so a large part of
+the work was about reducing false positives and distinguishing real
+failures from normal production behavior.</p>
+<h3 id="consecutive-failure-gates">Consecutive-failure gates</h3>
+<p>A service is not declared down because of a single timeout. Failure
+counters must cross a configured threshold before an incident is
+promoted.</p>
+<h3 id="resource-aware-deduplication">Resource-aware deduplication</h3>
+<p>Alerts are deduplicated by alert type, source and affected resource
+so one event does not spam the operator, while separate affected
+processes are not accidentally collapsed into one incident.</p>
+<h3 id="busy-vs-dead-vs-stuck">Busy vs dead vs stuck</h3>
+<p>Some AI inference services can temporarily block <code>/health</code>
+while processing a heavy request. The watcher therefore
+distinguishes:</p>
+<p><code>busy + work progressing</code> → healthy operational
+state<br />
+<code>port dead</code> → service down<br />
+<code>port alive + health blocked + work not progressing</code> →
+service stuck</p>
+<p>This eliminated an important class of false service-down alerts.</p>
+<h3 id="shadow-mode-for-new-detectors">Shadow mode for new
+detectors</h3>
+<p>The OCR degradation detector supports <strong>shadow mode</strong>:
+candidate incidents are written to the incident log but not sent to
+operators. This allows thresholds to be measured against production
+behavior before promotion to active alerting.</p>
+<h3 id="near-miss-telemetry">Near-miss telemetry</h3>
+<p>Borderline OCR degradation can be recorded without paging the
+operator, creating evidence for later threshold tuning instead of
+throwing away almost-triggered cases.</p>
+<h2 id="production-evidence">Production evidence</h2>
+<ul>
+<li><strong>~22 health-checked endpoints</strong> across APIs,
+frontends, AI inference and core infrastructure, plus PM2 processes,
+hosts, GPU and database signals.</li>
+<li><strong>15+ detector / alert types</strong> covering security,
+application, infrastructure, database, integration and AI-specific
+failures.</li>
+<li>Autonomous detection runs every <strong>60 seconds</strong>; web
+operational views refresh approximately every <strong>10–15
+seconds</strong>.</li>
+<li>The production security/infra watcher recorded <strong>152 alerts
+during Aug 2026</strong> across its monitored environment.</li>
+<li>A real preview process once entered a restart storm at roughly
+<strong>222 restarts/minute</strong> against a threshold of 3; the
+crash-loop detector surfaced it on the next monitoring cycle.</li>
+<li>Dedicated chat delivery turns incidents into mobile-visible
+operational events instead of leaving them buried in server logs.</li>
+<li>AI infrastructure monitoring includes an <strong>NVIDIA
+H200</strong> and self-hosted inference services.</li>
+<li>The external AI access boundary exposes only <strong>7 MCP
+tools</strong> and is covered by <strong>19 security-wrapper
+tests</strong>.</li>
+</ul>
+<h2 id="why-the-ai-specific-detectors-matter">Why the AI-specific
+detectors matter</h2>
+<p>Traditional health checks answer <strong>“is the process
+reachable?”</strong>. For production AI that is not enough.</p>
+<p>The LLM endpoint-drift detector protects against configuration
+reality diverging from the live GPU host after model migrations. The OCR
+degradation detector protects against a more subtle failure: <strong>the
+service is up, requests succeed, but the model output quality has
+collapsed</strong>.</p>
+<p>Those two detectors move monitoring from simple uptime toward
+<strong>behavioral observability for AI systems</strong>.</p>
+<h2 id="why-the-mcp-boundary-matters">Why the MCP boundary matters</h2>
+<p>A production agent and an external AI client should not automatically
+receive the same capabilities.</p>
+<p>The internal incident assistant can operate with a broader diagnostic
+toolset because it runs inside the controlled operational workflow. A
+local IDE/LLM integration gets a deliberately reduced, read-only MCP
+surface.</p>
+<p>That separation demonstrates a principle I use repeatedly in agent
+systems:</p>
+<blockquote>
+<p><strong>capabilities should be granted by execution context, not by
+how persuasive the prompt sounds.</strong></p>
+</blockquote>
+<h2 id="my-role">My role</h2>
+<p>Designed and built the system end-to-end: control-panel architecture
+and UI, monitoring inventory, detector logic, GPU/model observability,
+security telemetry, database-backed configuration and alert history,
+incident deduplication, chat delivery, self-hosted Qwen integration,
+tool-calling workflow, least-privilege MCP access layer and production
+operation.</p>
+<h2 id="stack">Stack</h2>
+<p><code>Next.js 14</code> · <code>TypeScript</code> ·
+<code>React</code> · <code>Tailwind CSS</code> ·
+<code>Framer Motion</code> · <code>Recharts</code> ·
+<code>jose/JWT</code><br />
+<code>Python</code> · <code>PostgreSQL</code> · <code>psycopg2</code> ·
+<code>PM2</code> · <code>nginx</code> ·
+<code>Linux / systemd / cron</code> · <code>Socket.IO</code><br />
+<code>Qwen</code> · <code>OpenAI-compatible inference</code> ·
+<code>NVIDIA H200</code> · <code>GPU telemetry</code> ·
+<code>tool calling</code> · <code>MCP Python SDK</code></p>
+<h2 id="engineering-principles-demonstrated">Engineering principles
+demonstrated</h2>
+<ul>
+<li><strong>Control plane, not dashboard:</strong> observation,
+operational state and incident workflow live together.</li>
+<li><strong>Deterministic first:</strong> measurable detectors remain
+the source of truth; the LLM assists with interpretation rather than
+deciding whether infrastructure is healthy.</li>
+<li><strong>Least privilege for agents:</strong> database permissions,
+explicit tool whitelists and bounded outputs constrain capability
+independently of prompts.</li>
+<li><strong>AI-aware observability:</strong> monitor model endpoints and
+output degradation, not only ports and CPUs.</li>
+<li><strong>Low-noise operations:</strong> consecutive checks,
+deduplication, maintenance state, near-miss logging and shadow rollout
+reduce alert fatigue.</li>
+<li><strong>Operator-first incident response:</strong> alerts reach the
+communication surface already used by the operator, with a tool-enabled
+assistant available for follow-up investigation.</li>
+<li><strong>Private implementation, public evidence:</strong> production
+code and infrastructure remain private while architecture, engineering
+decisions and sanitized results can still be demonstrated safely.</li>
+</ul>
+
+</div>
+<div class="cta"><b>Hiring for applied AI, computer vision, RAG or LLM agents?</b><br>I'm based in Tbilisi and open to new roles. Email <a href="mailto:haraev87@gmail.com">haraev87@gmail.com</a> or message me on <a href="https://t.me/Edharaev">Telegram</a>.</div>
+</main>
+<footer class="site"><div class="wrap">© 2026 Eduard Kharaev · Applied AI Engineer · Tbilisi, Georgia · <a href="mailto:haraev87@gmail.com">haraev87@gmail.com</a> · <a href="https://t.me/Edharaev">Telegram</a> · <a href="https://github.com/swd07">GitHub</a></div></footer>
+</body></html>

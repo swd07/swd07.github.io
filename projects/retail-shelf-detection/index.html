@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retail Shelf Recognition — case study | Eduard Kharaev</title>
+<meta name="description" content="Production multimodal recognition of products on store shelves: GroundingDINO, Qwen-VL OCR, Qdrant retrieval, DINOv2 and ArcFace, deterministic fusion, guardrails and explicit unknowns.">
+<meta name="author" content="Eduard Kharaev">
+<link rel="canonical" href="https://swd07.github.io/projects/retail-shelf-detection/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Eduard Kharaev">
+<meta property="og:title" content="Retail Shelf Recognition — case study | Eduard Kharaev">
+<meta property="og:description" content="Production multimodal recognition of products on store shelves: GroundingDINO, Qwen-VL OCR, Qdrant retrieval, DINOv2 and ArcFace, deterministic fusion, guardrails and explicit unknowns.">
+<meta property="og:url" content="https://swd07.github.io/projects/retail-shelf-detection/">
+<meta property="og:image" content="https://swd07.github.io/assets/shelf-detection-live.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Retail Shelf Recognition — case study | Eduard Kharaev">
+<meta name="twitter:description" content="Production multimodal recognition of products on store shelves: GroundingDINO, Qwen-VL OCR, Qdrant retrieval, DINOv2 and ArcFace, deterministic fusion, guardrails and explicit unknowns.">
+<meta name="twitter:image" content="https://swd07.github.io/assets/shelf-detection-live.jpg">
+<meta name="theme-color" content="#0b0f14">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0f14;--bg2:#111820;--fg:#e6edf3;--muted:#9aa6b2;--accent:#2dd4bf;--accent2:#38bdf8;--line:#243140;--card:#121a23;--code:#0f1620}
+@media (prefers-color-scheme:light){:root{--bg:#ffffff;--bg2:#f5f8fa;--fg:#1a2129;--muted:#5b6672;--accent:#0f766e;--accent2:#0369a1;--line:#e3e8ee;--card:#f7f9fb;--code:#f2f5f8}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.65 Inter,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.narrow{max-width:760px}
+header.site{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header.site .wrap{display:flex;justify-content:space-between;align-items:center;height:60px;gap:12px}
+.brand{font-weight:700;color:var(--fg);letter-spacing:-.01em}
+.brand span{color:var(--accent)}
+nav{display:flex;gap:18px;font-size:15px}
+nav a{color:var(--muted)}
+.hero{padding:72px 0 40px;background:radial-gradient(900px 400px at 85% -10%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 70%)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);padding:4px 12px;border-radius:999px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
+.hero h1{font-size:clamp(38px,7vw,64px);line-height:1.05;letter-spacing:-.03em;margin:18px 0 8px}
+.hero .role{font-size:clamp(19px,3vw,24px);color:var(--muted);margin:0 0 20px}
+.hero p.lead{max-width:680px;font-size:18px;margin:0 0 28px}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-block;padding:11px 20px;border-radius:10px;font-weight:600;font-size:15px;border:1px solid var(--line);color:var(--fg);background:var(--card)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#04201c}
+.btn:hover{text-decoration:none;filter:brightness(1.08)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:44px 0 8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.stat b{display:block;font-size:30px;letter-spacing:-.02em;color:var(--fg)}
+.stat span{font-size:14px;color:var(--muted)}
+section{padding:36px 0}
+h2.sec{font-size:28px;letter-spacing:-.02em;margin:0 0 6px}
+p.sec-sub{color:var(--muted);margin:0 0 22px}
+.feature{display:grid;grid-template-columns:1.2fr 1fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;color:var(--fg)}
+.feature:hover{text-decoration:none;border-color:var(--accent)}
+.feature img{width:100%;height:100%;object-fit:cover;display:block}
+.feature .txt{padding:26px}
+.kicker{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:600}
+.feature h3{font-size:24px;line-height:1.25;margin:8px 0 10px;letter-spacing:-.01em}
+.feature p{color:var(--muted);margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;color:var(--fg);transition:border-color .15s,transform .15s}
+.card:hover{text-decoration:none;border-color:var(--accent);transform:translateY(-2px)}
+.card .thumb{height:170px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 30%,var(--bg2)),color-mix(in srgb,var(--accent2) 25%,var(--bg2)));display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card .thumb img{width:100%;height:100%;object-fit:cover;object-position:top}
+.card .thumb .ph{font-size:15px;font-weight:600;color:var(--fg);opacity:.85;padding:0 20px;text-align:center}
+.card .body{padding:18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card h3{font-size:18px;line-height:1.3;margin:0}
+.card p{font-size:15px;color:var(--muted);margin:0;flex:1}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--bg2);border:1px solid var(--line);color:var(--muted)}
+.skills{display:flex;flex-wrap:wrap;gap:8px}
+.skills .tag{font-size:14px;padding:6px 12px}
+.contact{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px}
+footer.site{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:14px;margin-top:30px}
+/* article / project pages */
+.page{padding:40px 0 20px}
+.crumbs{font-size:14px;color:var(--muted);margin-bottom:18px}
+.page h1{font-size:clamp(30px,5.5vw,44px);line-height:1.12;letter-spacing:-.02em;margin:0 0 10px}
+.page .sub{font-size:20px;color:var(--muted);margin:0 0 14px}
+.page .meta{font-size:14px;color:var(--muted);margin-bottom:26px}
+.prose{font-size:18px;line-height:1.75}
+.prose h1{display:none}
+.prose h2{font-size:26px;line-height:1.3;letter-spacing:-.01em;margin:44px 0 10px}
+.prose h3{font-size:21px;margin:32px 0 8px}
+.prose h4{font-size:18px;margin:26px 0 6px}
+.prose img{max-width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.prose blockquote{margin:18px 0;padding:10px 18px;border-left:3px solid var(--accent);background:var(--card);border-radius:0 8px 8px 0;color:var(--muted)}
+.prose code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em;background:var(--code);padding:2px 6px;border-radius:5px}
+.prose pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:14px;line-height:1.55}
+.prose pre code{background:none;padding:0}
+.prose pre.mermaid{background:var(--card);text-align:center}
+.prose table{width:100%;border-collapse:collapse;font-size:15px;display:block;overflow-x:auto}
+.prose th,.prose td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+.prose th{background:var(--card)}
+.prose li{margin:5px 0}
+.prose hr{border:0;border-top:1px solid var(--line);margin:40px 0}
+img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line);margin-bottom:10px}
+.cta{margin:44px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+@media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.feature{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.grid{grid-template-columns:1fr}nav{gap:12px;font-size:14px}.hero{padding-top:44px}.prose{font-size:17px}}
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "Retail Shelf Recognition", "headline": "Retail Shelf Recognition", "description": "Production multimodal recognition of products on store shelves: GroundingDINO, Qwen-VL OCR, Qdrant retrieval, DINOv2 and ArcFace, deterministic fusion, guardrails and explicit unknowns.", "author": {"@type": "Person", "name": "Eduard Kharaev", "jobTitle": "Applied AI Engineer", "url": "https://swd07.github.io/", "email": "mailto:haraev87@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Tbilisi", "addressCountry": "GE"}, "sameAs": ["https://github.com/swd07", "https://t.me/Edharaev"], "knowsAbout": ["Applied AI", "Computer Vision", "Vision-Language Models", "Retrieval-Augmented Generation", "Vector Search", "LLM Agents", "MLOps", "Self-hosted LLM inference", "vLLM"]}, "url": "https://swd07.github.io/projects/retail-shelf-detection/", "image": "https://swd07.github.io/assets/shelf-detection-live.jpg", "dateModified": "2026-09-26"}</script>
+
+</head>
+<body>
+<header class="site"><div class="wrap"><a class="brand" href="/">Eduard <span>Kharaev</span></a><nav><a href="/#writing">Writing</a><a href="/#projects">Projects</a><a href="/#contact">Contact</a></nav></div></header>
+<main class="wrap narrow page">
+<div class="crumbs"><a href="/">Home</a> · <a href="/#projects">Projects</a></div>
+<h1>Retail Shelf Recognition</h1>
+<p class="sub">Production multimodal recognition of products on store shelves: GroundingDINO, Qwen-VL OCR, Qdrant retrieval, DINOv2 and ArcFace, deterministic fusion, guardrails and explicit unknowns.</p>
+<p class="meta">Case study by <a href="/">Eduard Kharaev</a> · <a href="https://github.com/swd07/retail-shelf-detection">Source on GitHub</a></p>
+<div class="prose">
+<h1
+id="retail-shelf-detection--production-retrieval--multimodal-shelf-intelligence">Retail
+Shelf Detection — Production Retrieval &amp; Multimodal Shelf
+Intelligence</h1>
+<blockquote>
+<p>Technical case-study repository for a live merchandising AI
+subsystem: offline field capture, detection, OCR/VLM, dense retrieval,
+visual metric learning, deterministic fusion, guardrails, evaluation and
+gated production rollout.</p>
+</blockquote>
+<p><strong>Portfolio overview:</strong> <a
+href="https://github.com/swd07/ai-platform-portfolio">ai-platform-portfolio</a><br />
+<strong>Parent product:</strong> <a
+href="/projects/chaban-platform/">AI
+Chaban2 — commercial operating platform</a><br />
+<strong>Field-product deep dive:</strong> <a
+href="/projects/merch-terminal/">Offline
+Merchandising Terminal</a></p>
+<p><img loading="lazy" src="/assets/shelf-detection-live.jpg"
+alt="Live pipeline output: detected packs, brand/SKU labels, price tags, and explicit unknown abstentions" /></p>
+<p><em>Real shelf output: localized packs, brand/SKU labels, price-tag
+reads and explicit <code>unknown</code> when the evidence is not strong
+enough.</em></p>
+<hr />
+<h2 id="status">Status</h2>
+<p>This is <strong>production engineering with a pilot business
+rollout</strong>.</p>
+<ul>
+<li><strong>6,145+ shelf photos</strong> processed in the merchandising
+subsystem.</li>
+<li><strong>5,882 completed analyses</strong> in the audited production
+queue.</li>
+<li>Current rollout: <strong>40 retail outlets / 3 merchandising
+users</strong>.</li>
+<li><strong>~320k OCR calls</strong> processed by the production
+service.</li>
+<li><strong>~108k ArcFace shadow evaluations</strong> recorded.</li>
+</ul>
+<p>The engineering pipeline is live; the organizational rollout is still
+intentionally limited.</p>
+<hr />
+<h2 id="problem">Problem</h2>
+<p>A shelf photo has to become trustworthy commercial data:</p>
+<ul>
+<li><strong>share of shelf</strong> — own brand vs competitors;</li>
+<li><strong>assortment coverage</strong> — which brands/SKUs are
+present;</li>
+<li><strong>package / format / size mix</strong>;</li>
+<li><strong>price-tag evidence</strong>;</li>
+<li>inputs for merchandising review and execution analytics.</li>
+</ul>
+<p>The difficult cases are not obvious detections. They are visually
+similar sibling products that differ only by weight, fat percentage,
+flavour, label detail or package format.</p>
+<p>For this problem, a confident wrong own-vs-competitor decision is
+worse than returning <code>unknown</code>. The system is therefore
+designed around <strong>evidence, abstention and reproducible
+post-mortems</strong>, not maximum forced coverage.</p>
+<p>There is also a non-model problem: retail capture happens under weak
+connectivity, app interruption and device restarts. A model pipeline is
+not production-ready if the field user cannot reliably create and
+synchronize the input data.</p>
+<hr />
+<h2 id="end-to-end-production-architecture">End-to-end production
+architecture</h2>
+<pre class="text"><code>Native Android field terminal
+  → Room-backed durable photo queue
+  → network-aware WorkManager synchronization
+  → ingest API
+  → object storage + durable analysis queue
+  → async analysis worker
+  → GroundingDINO detection
+  → Qwen2.5-VL OCR / package reading
+  → Qwen3-Embedding-8B
+  → Qdrant dense text retrieval
+  → attribute-aware reranking
+  → DINOv2 visual k-NN
+  → fine-tuned ArcFace metric retrieval
+  → deterministic signal fusion
+  → evidence guardrails
+  → SKU / brand / unknown
+  → share-of-shelf / assortment / competitor analytics</code></pre>
+<p>The production AI stack is self-hosted on owned NVIDIA H200
+infrastructure.</p>
+<p>The LLM <strong>does not choose the final SKU</strong>. It extracts
+textual and package evidence; the final identity is selected by a
+deterministic decision layer that combines independent retrieval and
+visual signals.</p>
+<hr />
+<h2 id="field-product--offline-first-android-terminal">Field product —
+offline-first Android terminal</h2>
+<p>The merchandising terminal is a native <strong>Kotlin / Jetpack
+Compose</strong> application built for actual store conditions rather
+than a thin camera screen.</p>
+<h3 id="durable-work-before-upload">Durable work before upload</h3>
+<p>Captured photos enter a <strong>Room-backed local queue</strong> with
+the shelf/display and capture context needed for delayed delivery. The
+field user can keep working before the network request or GPU analysis
+finishes.</p>
+<p>The queue supports:</p>
+<ul>
+<li>pending / upload / failure state visible to the user;</li>
+<li>per-photo retry and delete;</li>
+<li>bulk send;</li>
+<li>periodic synchronization through <strong>WorkManager</strong>;</li>
+<li>immediate retry when connectivity changes from offline to
+online;</li>
+<li>recovery of records left in an in-flight state after process/device
+interruption.</li>
+</ul>
+<p>The recovery path is important: a mobile process can die mid-upload,
+so <code>UPLOADING</code> cannot be treated as an eternal terminal
+state.</p>
+<h3 id="offline-shelf-registry">Offline shelf registry</h3>
+<p>Later iterations moved more than the media queue offline. The
+application caches the shelf/display registry in Room and can fall back
+to the local copy when the API is unavailable. Cover images use disk
+caching and can be pre-warmed after connectivity returns.</p>
+<p>Actions that require authoritative server state are explicitly
+guarded while offline rather than pretending every mutation succeeded
+locally.</p>
+<h3 id="analysis-vs-planogram-mode">Analysis vs planogram mode</h3>
+<p>The same field application distinguishes normal analysis capture from
+<strong>planogram</strong> work.</p>
+<p>A merchandiser can move through:</p>
+<pre class="text"><code>store → shelf/display → capture → local queue → analysis</code></pre>
+<p>or:</p>
+<pre class="text"><code>store → shelf/display → planogram image → shelf-zone annotation → sync</code></pre>
+<p>The on-device shelf-zone editor supports drawing regions over an
+image, dragging existing regions and resizing them with edge/corner
+handles. This keeps structured correction close to the physical shelf,
+where the scene is easiest to understand.</p>
+<h3 id="why-this-matters-to-the-ai-system">Why this matters to the AI
+system</h3>
+<p>Capture, upload and inference are independent stages. Temporary store
+connectivity or a busy model server does not block the merchandiser from
+taking the next shelf photo.</p>
+<p>→ <strong><a
+href="/projects/merch-terminal/">Detailed
+offline field-terminal case study</a></strong></p>
+<hr />
+<h2 id="ingest--provenance">Ingest &amp; provenance</h2>
+<p>The ingest layer provides:</p>
+<ul>
+<li>authenticated photo upload;</li>
+<li>SHA-256 duplicate protection;</li>
+<li>object storage for media;</li>
+<li>durable analysis queue;</li>
+<li>asynchronous workers;</li>
+<li>production provenance linking analysis to code/config
+revisions.</li>
+</ul>
+<p>This separates field capture from GPU inference and preserves enough
+context for delayed processing and later post-mortems.</p>
+<p>Analysis jobs run through a PostgreSQL queue using
+<code>FOR UPDATE SKIP LOCKED</code>, with up to 3 attempts and automatic
+recovery of jobs stuck for more than 30 minutes.</p>
+<hr />
+<h2 id="detection">Detection</h2>
+<p><strong>GroundingDINO</strong> localizes product regions before
+recognition. Earlier detector work also included closed-set / YOLO
+experiments and deduplication logic for contained, overlapping and
+shelf-band false-positive regions.</p>
+<p>A separate detector track improved measured <strong>F1 from 0.68 →
+0.91 on unseen shelf photos</strong>.</p>
+<p>Detection is treated as one stage of the recognition system rather
+than the final business metric: a good box can still become an incorrect
+SKU, so downstream retrieval/evidence gates remain mandatory.</p>
+<hr />
+<h2 id="ocr--vlm-evidence">OCR / VLM evidence</h2>
+<p>Each product crop is read by self-hosted
+<strong>Qwen2.5-VL-72B-AWQ</strong> served through vLLM.</p>
+<p>The VLM extracts evidence such as:</p>
+<ul>
+<li>brand text;</li>
+<li>product-name fragments;</li>
+<li>weight / volume;</li>
+<li>fat percentage;</li>
+<li>flavour/category clues;</li>
+<li>package-form clues.</li>
+</ul>
+<p>OCR/VLM output is evidence for retrieval and guardrails. It is not
+trusted as a final classifier.</p>
+<hr />
+<h2 id="dense-retrieval">Dense retrieval</h2>
+<h3 id="catalog-representation">Catalog representation</h3>
+<p>Each retrieval entry is represented as structured product text
+combining attributes such as:</p>
+<p><code>brand + name + category + subcategory + flavour + fat% + weight + volume + package_type + visual_markers</code></p>
+<p>Embeddings are produced by a self-hosted
+<strong>Qwen3-Embedding-8B</strong> service.</p>
+<h3 id="qdrant-search">Qdrant search</h3>
+<p>For each detected crop:</p>
+<ol type="1">
+<li>OCR/VLM produces the available text evidence.</li>
+<li>The query is embedded with <strong>Qwen3-Embedding-8B</strong>.</li>
+<li><strong>Qdrant</strong> performs cosine dense retrieval.</li>
+<li>Production retrieval depth is <strong>top-20</strong>.</li>
+<li>Reliable brand evidence can activate brand-filtered candidate
+narrowing.</li>
+<li>Candidates are reranked with structured attributes such as brand,
+weight, fat percentage, category and package evidence.</li>
+</ol>
+<p>The embedding vector is <strong>4096-dimensional and
+normalized</strong>.</p>
+<p>The production vector collection contains <strong>1,345 retrieval
+entries</strong>. The broader merchandising catalog contains
+approximately <strong>1.5k own + competitor SKUs</strong>, so not every
+merchandising catalog record is necessarily represented identically in
+the vector collection.</p>
+<hr />
+<h2 id="multimodal-retrieval">Multimodal retrieval</h2>
+<p>Dense text retrieval is only one path.</p>
+<p>In parallel, the production system uses:</p>
+<ul>
+<li><strong>DINOv2 ViT-L/14</strong> for general visual embeddings and
+k-NN retrieval;</li>
+<li>a fine-tuned <strong>ArcFace</strong> metric-learning encoder for
+independent visual votes;</li>
+<li>OCR-derived brand and product-attribute evidence;</li>
+<li>package-form evidence for ambiguous families.</li>
+</ul>
+<p>The working galleries are on the order of tens of thousands of
+confirmed/reference crops (approximately 18.9k DINOv2 confirmed crops
+and 9.1k ArcFace references in the audited retrieval configuration).</p>
+<p>A typical decision ladder can look like:</p>
+<pre class="text"><code>OCR brand + visual agreement
+→ OCR brand + dense retrieval
+→ strong dense retrieval
+→ dense retrieval + independent visual support
+→ visual retrieval
+→ weak evidence
+→ unknown</code></pre>
+<p>Every final prediction stores enough provenance — decision path,
+scores, thresholds and supporting signals — to reconstruct why the
+system made that decision.</p>
+<hr />
+<h2 id="deterministic-fusion-and-guardrails">Deterministic fusion and
+guardrails</h2>
+<p>The acceptance layer is deliberately conservative.</p>
+<p>Examples of production guardrails include:</p>
+<ul>
+<li>OCR <strong>brand verification</strong>;</li>
+<li><strong>competitor protection</strong> to reduce own/competitor
+contamination;</li>
+<li>retrieval-evidence gates requiring independent support for weak
+candidates;</li>
+<li><strong>package-form</strong> protection for bottle / canister /
+carton ambiguity;</li>
+<li><strong>ArcFace rescue</strong> when the metric-learning signal is
+stronger than the primary visual path;</li>
+<li><strong>price-tag / promo rejection</strong> so non-product regions
+do not enter product metrics;</li>
+<li>sibling / weight evidence where available.</li>
+</ul>
+<p>Low-evidence cases become <strong><code>unknown</code></strong>
+instead of being forced into a SKU.</p>
+<p>That abstention is part of the product design: share-of-shelf and
+assortment numbers are only useful if the system is allowed to say that
+it does not know.</p>
+<hr />
+<h2 id="evaluation-as-production-architecture">Evaluation as production
+architecture</h2>
+<p>Evaluation is not a notebook step performed after model training. It
+is part of the release path.</p>
+<p>The system uses:</p>
+<ul>
+<li>human-labelled <strong>golden sets</strong>;</li>
+<li>stratification by failure mode;</li>
+<li>grouped / cross-store validation to reduce leakage;</li>
+<li>distractor and hard-negative sets;</li>
+<li><strong>Recall@1 / Recall@5</strong> for retrieval tracks;</li>
+<li>FPR-anchored precision calibration;</li>
+<li>Wilson confidence intervals for small strata;</li>
+<li>pre-registered <strong>acceptance / kill thresholds</strong>;</li>
+<li>a <strong>47k-box production replay harness</strong> that imports
+the real production decision module;</li>
+<li>shadow tables / candidate-model telemetry;</li>
+<li>nightly regression checks.</li>
+</ul>
+<p>Candidate changes are promoted through:</p>
+<pre class="text"><code>off → shadow → active</code></pre>
+<p>This process has rejected rerankers and encoder replacements that
+looked promising locally but weakened controlled production
+evaluation.</p>
+<hr />
+<h2 id="measured-results">Measured results</h2>
+<h3 id="end-to-end">End-to-end</h3>
+<ul>
+<li><strong>Brand precision: 95.8%</strong> on the confirmed end-to-end
+golden set.</li>
+<li><strong>SKU precision: 73.1% end-to-end</strong>.</li>
+<li>Bare retrieval alone was approximately <strong>29% SKU
+precision</strong> before the full cascade, independent visual evidence
+and guardrails.</li>
+</ul>
+<h3 id="retrieval--metric-learning">Retrieval / metric learning</h3>
+<ul>
+<li>Fine-tuned ArcFace cross-store <strong>Recall@1: 84.1%</strong> on
+the audited benchmark.</li>
+<li>DINOv2 baseline on the same benchmark: <strong>26.4%
+Recall@1</strong>.</li>
+<li>Human readability ceiling on the unresolved tail: <strong>76.4% ±
+5.8 pp</strong> under a blind, pre-registered protocol.</li>
+</ul>
+<h3 id="production-telemetry">Production telemetry</h3>
+<ul>
+<li><strong>~320k OCR calls</strong> processed.</li>
+<li><strong>~108k ArcFace shadow evaluations</strong>.</li>
+<li><strong>6k+ shelf photos</strong> in the merchandising system.</li>
+<li><strong>5,882 completed production analyses</strong> in the audited
+queue.</li>
+</ul>
+<hr />
+<h2 id="business-outputs">Business outputs</h2>
+<p>Recognition results are not the end product. They feed a
+merchandising dashboard in the Chaban2 platform:</p>
+<ul>
+<li><strong>Share of shelf</strong> — own vs competitor share by
+facings, per photo, store and brand; stores below 30% own share are
+flagged; shelf position (top / eye / middle / bottom) is recorded.</li>
+<li><strong>SKU presence</strong> — for each own SKU: in how many
+analysed stores it was found, its facings, and a good / warning /
+critical status.</li>
+<li><strong>Price intelligence from price tags</strong> — own average
+shelf price vs the market, a price index, per-category comparison with
+competitor brands and price spread across stores.</li>
+<li><strong>Store markup</strong> — shelf price vs base price per store
+and SKU, with a high / normal / low markup status.</li>
+<li><strong>RRP vs shelf price</strong> — recommended retail prices
+compared with the prices actually read from price tags.</li>
+<li><strong>Assortment coverage</strong> — which own products and
+attributes are covered in each store, with coverage gaps and competitor
+presence.</li>
+</ul>
+<p>Dashboard data is scoped by team: a manager sees only the stores of
+their team.</p>
+<h3 id="human-in-the-loop-improvement">Human-in-the-loop
+improvement</h3>
+<p>Low-evidence crops go to an <strong>unknown inbox</strong>
+(<code>new → reviewed → promoted / excluded</code>) together with the
+crop, OCR text, visual candidates and a VLM suggestion. A reviewer
+assigns the product, and promoted crops are added to the confirmed
+visual gallery used for DINOv2 visual re-ranking (enabled by a feature
+flag). The system improves on its own failure cases without retraining a
+model.</p>
+<h3 id="store-compliance-and-monitoring">Store compliance and
+monitoring</h3>
+<ul>
+<li><strong>Drift-based compliance</strong> — after each store visit,
+the shelf is compared with that store's own recent history (median and
+IQR over previous visits). Rules flag a drop in own share of shelf or
+missing anchor products, and stores are ranked
+<code>ok / warning / critical / insufficient_data</code>, critical
+first.</li>
+<li><strong>Operational alerts</strong> — every 15 minutes a monitor
+checks photo flow, the share of unknown products and pipeline health,
+and alerts the team chat.</li>
+</ul>
+<p>Not implemented: comparison against a reference planogram image, and
+business alerts such as "own share dropped in store N". Report export is
+also not in production.</p>
+<hr />
+<h2 id="what-this-is--and-is-not">What this is — and is not</h2>
+<p>This is a <strong>production retrieval-augmented recognition system
+embedded in a field workflow</strong>.</p>
+<p>It is <strong>not</strong> a classic document-question-answering RAG
+application:</p>
+<ul>
+<li>retrieved catalog candidates do not become documents for an LLM
+answer;</li>
+<li>the LLM does not generate the final SKU identity;</li>
+<li>there is no document-citation path in production;</li>
+<li>final identity comes from explainable fusion of retrieval, visual
+and attribute evidence.</li>
+</ul>
+<p>For this business problem, deterministic fusion and calibrated
+abstention provide stronger control than asking an LLM to make the final
+identity decision.</p>
+<hr />
+<h2 id="my-role">My role</h2>
+<p>For the broader AI Chaban2 platform I was <strong>Head of AI and
+Technical Owner / platform architect</strong>: I built the first
+production versions hands-on, then hired and led a team of <strong>7
+engineers</strong> who extended them.</p>
+<p>For this merchandising subsystem I owned the technical architecture
+and production rollout and was hands-on in:</p>
+<ul>
+<li>retrieval / matching architecture;</li>
+<li>OCR/VLM and embedding services;</li>
+<li>Qdrant retrieval and attribute reranking;</li>
+<li>multimodal fusion and guardrails;</li>
+<li>golden sets, replay evaluation and kill criteria;</li>
+<li>metric-learning evaluation;</li>
+<li>production inference / rollout methodology;</li>
+<li>end-to-end field-to-analysis architecture and operational tooling
+around the pipeline.</li>
+</ul>
+<p>The broader commercial platform and mobile application were extended
+by the team I led; this repository focuses on this subsystem and the
+technical work I did on it personally.</p>
+<hr />
+<h2 id="stack">Stack</h2>
+<p><code>Python</code> · <code>FastAPI</code> · <code>PyTorch</code> ·
+<code>GroundingDINO</code> · <code>Qwen2.5-VL-72B-AWQ</code> ·
+<code>Qwen3-Embedding-8B</code> · <code>Qdrant</code> ·
+<code>DINOv2 ViT-L/14</code> · <code>ArcFace</code> · <code>vLLM</code>
+· <code>PostgreSQL</code> · <code>MinIO / S3-compatible storage</code> ·
+<code>Kotlin</code> · <code>Jetpack Compose</code> · <code>Room</code> ·
+<code>WorkManager</code> · <code>Coil</code> · <code>Docker</code> ·
+<code>systemd / cron</code> · <code>NVIDIA H200</code></p>
+<hr />
+<h2 id="runnable-examples">Runnable examples</h2>
+<p>Production code and commercial data are private, but this repository
+includes small runnable examples of the <strong>decision-logic shape and
+evaluation discipline</strong>:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> examples/fusion_demo.py</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> examples/evaluate.py</span></code></pre></div>
+<p><code>fusion_demo.py</code> walks synthetic crops through
+priority-ordered fusion, including abstention paths.
+<code>evaluate.py</code> demonstrates precision/recall/F1, abstention
+rate and why naive random splits can inflate metrics on correlated shelf
+crops.</p>
+<hr />
+<h2 id="deep-dives">Deep dives</h2>
+<ul>
+<li><a
+href="/projects/merch-terminal/">Offline
+field terminal</a> — durable mobile queue, reconnect recovery, shelf
+cache and planogram zones.</li>
+<li><a href="https://github.com/swd07/retail-shelf-detection/blob/main/docs/human-ceiling.md">Expert-readability ceiling</a> —
+blind protocol, ceiling calculation, intervals and limitations.</li>
+<li><a href="https://github.com/swd07/retail-shelf-detection/blob/main/docs/evaluation.md">Evaluation honesty</a> —
+population-level validation and grouped splits.</li>
+<li><a href="https://github.com/swd07/retail-shelf-detection/blob/main/docs/production-lessons.md">Production lessons</a> — shadow
+rollout, pre-registered gates and config-drift prevention.</li>
+<li><a href="https://github.com/swd07/retail-shelf-detection/blob/main/docs/metric-learning.md">Metric learning</a> — ArcFace
+shelf retrieval, gallery doctrine and rejected candidates.</li>
+</ul>
+<hr />
+<h2 id="related-work">Related work</h2>
+<ul>
+<li><strong><a
+href="https://github.com/swd07/ai-platform-portfolio">Full Applied AI /
+Solutions Architecture portfolio</a></strong></li>
+<li><strong><a
+href="/projects/chaban-platform/">AI
+Chaban2 commercial platform case study</a></strong></li>
+</ul>
+<p>Author: <strong>Eduard Kharaev</strong> — <a
+href="https://github.com/swd07">GitHub profile</a> · <a
+href="mailto:haraev87@gmail.com"><span>haraev87@gmail.com</span></a> ·
+Telegram <a href="https://t.me/Edharaev">@Edharaev</a></p>
+
+</div>
+<div class="cta"><b>Hiring for applied AI, computer vision, RAG or LLM agents?</b><br>I'm based in Tbilisi and open to new roles. Email <a href="mailto:haraev87@gmail.com">haraev87@gmail.com</a> or message me on <a href="https://t.me/Edharaev">Telegram</a>.</div>
+</main>
+<footer class="site"><div class="wrap">© 2026 Eduard Kharaev · Applied AI Engineer · Tbilisi, Georgia · <a href="mailto:haraev87@gmail.com">haraev87@gmail.com</a> · <a href="https://t.me/Edharaev">Telegram</a> · <a href="https://github.com/swd07">GitHub</a></div></footer>
+</body></html>
