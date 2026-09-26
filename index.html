@@ -34,6 +34,8 @@ header.site{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--
 header.site .wrap{display:flex;justify-content:space-between;align-items:center;height:60px;gap:12px}
 .brand{font-weight:700;color:var(--fg);letter-spacing:-.01em}
 .brand span{color:var(--accent)}
+.mono{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;border:1px solid color-mix(in srgb,var(--accent) 50%,transparent);color:var(--accent);font-weight:700;font-size:15px;letter-spacing:.02em}
+.mono:hover{text-decoration:none;background:color-mix(in srgb,var(--accent) 12%,transparent)}
 nav{display:flex;gap:18px;font-size:15px}
 nav a{color:var(--muted)}
 .hero{padding:72px 0 40px;background:radial-gradient(900px 400px at 85% -10%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 70%)}
@@ -111,7 +113,7 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 
 </head>
 <body>
-<header class="site"><div class="wrap"><a class="brand" href="/">Eduard <span>Kharaev</span></a><nav><a href="/#writing">Writing</a><a href="/#projects">Projects</a><a href="/#contact">Contact</a></nav></div></header>
+<header class="site"><div class="wrap"><a class="mono" href="/" aria-label="Eduard Kharaev — home">EK</a><nav><a href="/#writing">Writing</a><a href="/#projects">Projects</a><a href="/#contact">Contact</a></nav></div></header>
 <main>
 <div class="hero"><div class="wrap">
 <span class="eyebrow"><span class="dot"></span>Open to new roles · Tbilisi, Georgia</span>
