@@ -38,7 +38,7 @@ header.site .wrap{display:flex;justify-content:space-between;align-items:center;
 .mono:hover{text-decoration:none;background:color-mix(in srgb,var(--accent) 12%,transparent)}
 nav{display:flex;gap:18px;font-size:15px}
 nav a{color:var(--muted)}
-.hero{padding:72px 0 40px;background:radial-gradient(900px 400px at 85% -10%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 70%)}
+.hero{padding:72px 0 40px;--fg:#e9eff5;--muted:#a3b1bf;--accent:#2dd4bf;--accent2:#38bdf8;--line:#2b3a4a;--card:rgba(15,22,30,.66);color:var(--fg);background-color:#0b0f14;background-image:linear-gradient(90deg,#0b0f14 0%,#0b0f14 34%,rgba(11,15,20,.82) 52%,rgba(11,15,20,.35) 76%,rgba(11,15,20,.1) 100%),url("/assets/hero-bg.jpg");background-size:auto,cover;background-position:center,56% center;background-repeat:no-repeat;border-bottom:1px solid var(--line)}
 .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);padding:4px 12px;border-radius:999px}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
 .hero h1{font-size:clamp(38px,7vw,64px);line-height:1.05;letter-spacing:-.03em;margin:18px 0 8px}
@@ -106,7 +106,9 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 .mini:hover{text-decoration:none;border-color:var(--accent)}
 .mini h3{font-size:17px;margin:0}
 .mini p{font-size:14.5px;color:var(--muted);margin:0}
-@media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.feature{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.feature{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}
+/* Narrow screens: the face would sit under the text, so the overlay goes almost solid. */
+.hero{background-image:linear-gradient(180deg,rgba(11,15,20,.9) 0%,rgba(11,15,20,.93) 55%,rgba(11,15,20,.97) 100%),url("/assets/hero-bg.jpg");background-position:center,72% center}}
 @media (max-width:560px){.grid{grid-template-columns:1fr}nav{gap:12px;font-size:14px}.hero{padding-top:44px}.prose{font-size:17px}}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "ProfilePage", "mainEntity": {"@type": "Person", "name": "Eduard Kharaev", "jobTitle": "Applied AI Engineer", "url": "https://swd07.github.io/", "email": "mailto:haraev87@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Tbilisi", "addressCountry": "GE"}, "sameAs": ["https://github.com/swd07", "https://t.me/Edharaev"], "knowsAbout": ["Applied AI", "Computer Vision", "Vision-Language Models", "Retrieval-Augmented Generation", "Vector Search", "LLM Agents", "MLOps", "Self-hosted LLM inference", "vLLM"]}}</script>
