@@ -81,7 +81,6 @@ footer.site{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);f
 .page .sub{font-size:20px;color:var(--muted);margin:0 0 14px}
 .page .meta{font-size:14px;color:var(--muted);margin-bottom:26px}
 .prose{font-size:18px;line-height:1.75}
-.prose h1{display:none}
 .prose h2{font-size:26px;line-height:1.3;letter-spacing:-.01em;margin:44px 0 10px}
 .prose h3{font-size:21px;margin:32px 0 8px}
 .prose h4{font-size:18px;margin:26px 0 6px}
@@ -98,7 +97,13 @@ footer.site{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);f
 .prose hr{border:0;border-top:1px solid var(--line);margin:40px 0}
 img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line);margin-bottom:10px}
 .cta{margin:44px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
-@media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.feature{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+.more-h{font-size:20px;margin:36px 0 14px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.mini{display:flex;flex-direction:column;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;color:var(--fg);transition:border-color .15s}
+.mini:hover{text-decoration:none;border-color:var(--accent)}
+.mini h3{font-size:17px;margin:0}
+.mini p{font-size:14.5px;color:var(--muted);margin:0}
+@media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.feature{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.grid{grid-template-columns:1fr}nav{gap:12px;font-size:14px}.hero{padding-top:44px}.prose{font-size:17px}}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "Field-Sales & Commercial Operations Platform", "headline": "Field-Sales & Commercial Operations Platform", "description": "Offline-first platform for field sales reps with bidirectional 1C ERP integration, KPI, management BI, forecasting and merchandising AI. 98% of the company's ERP orders went through it.", "author": {"@type": "Person", "name": "Eduard Kharaev", "jobTitle": "Applied AI Engineer", "url": "https://swd07.github.io/", "email": "mailto:haraev87@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Tbilisi", "addressCountry": "GE"}, "sameAs": ["https://github.com/swd07", "https://t.me/Edharaev"], "knowsAbout": ["Applied AI", "Computer Vision", "Vision-Language Models", "Retrieval-Augmented Generation", "Vector Search", "LLM Agents", "MLOps", "Self-hosted LLM inference", "vLLM"]}, "url": "https://swd07.github.io/projects/chaban-platform/", "image": "https://swd07.github.io/assets/mobile-field-client.jpg", "dateModified": "2026-09-26"}</script>
@@ -112,17 +117,6 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 <p class="sub">Offline-first platform for field sales reps with bidirectional 1C ERP integration, KPI, management BI, forecasting and merchandising AI. 98% of the company&#x27;s ERP orders went through it.</p>
 <p class="meta">Case study by <a href="/">Eduard Kharaev</a> · <a href="https://github.com/swd07/ai-platform-portfolio/blob/master/projects/chaban.md">Source on GitHub</a></p>
 <div class="prose">
-<h1
-id="ai-chaban2--commercial-operating-platform-for-field-sales--distribution">AI
-Chaban2 — Commercial Operating Platform for Field Sales &amp;
-Distribution</h1>
-<blockquote>
-<p>A production field-sales and commercial-operations platform for the
-distribution subsidiary of a dairy producer: offline mobile workflows
-for sales reps, bidirectional 1C ERP integration, KPI and motivation,
-management BI, forecasting, merchandising computer vision, and
-self-hosted AI services.</p>
-</blockquote>
 <p><img loading="lazy" src="/assets/chaban-architecture.jpg"
 alt="Chaban platform architecture" /></p>
 <h2 id="what-the-platform-is">What the platform is</h2>
@@ -334,84 +328,22 @@ changes on anecdotal examples.</li>
 production product; the forecast is used for commercial planning /
 recommendations rather than being presented as an autonomous supply
 planning system.</p>
-<h2
-id="merchandising-ai--field-capture-to-shelf-intelligence">Merchandising
-AI — Field Capture to Shelf Intelligence</h2>
-<p>The merchandising subsystem combines a <strong>native offline-first
-Android field product</strong> with the production retrieval /
-computer-vision pipeline.</p>
-<p>The field-to-AI path is:</p>
-<pre class="text"><code>Kotlin / Jetpack Compose terminal
-→ Room-backed durable photo queue
-→ network-aware WorkManager synchronization
-→ ingest API (JWT, SHA-256 dedup, object storage)
-→ analysis queue
-→ GPU detection / OCR / retrieval / fusion
-→ annotation + metrics store
-→ office control center</code></pre>
-<h3 id="offline-field-terminal">Offline field terminal</h3>
-<p>The Android terminal is more than a camera wrapper. It supports:</p>
+<h2 id="merchandising-ai">Merchandising AI</h2>
+<p>The platform includes a production merchandising subsystem: an
+offline-first Android terminal for shelf photos and a multimodal
+recognition pipeline (GroundingDINO, Qwen-VL OCR, catalog retrieval,
+visual matching, deterministic fusion and guardrails). It reached
+<strong>95.8% brand precision</strong> and <strong>73.1% SKU
+precision</strong> end to end, and fed share-of-shelf, pricing and
+store-compliance reports.</p>
 <ul>
-<li>shelf/display selection and capture directly from the relevant
-card;</li>
-<li><strong>analysis vs. planogram</strong> capture modes;</li>
-<li>Room persistence for queued photos and their shelf/business
-context;</li>
-<li>a unified queue with retry/delete and bulk send;</li>
-<li>immediate retry when connectivity returns plus periodic WorkManager
-fallback;</li>
-<li>recovery of uploads left stuck in an in-flight state after
-process/device interruption;</li>
-<li>locally cached shelf/display registry for offline fallback;</li>
-<li>disk-cached/pre-warmed cover images;</li>
-<li>explicit guards around mutations that require live server
-state.</li>
+<li><a href="https://github.com/swd07/ai-platform-portfolio/blob/master/projects//projects/retail-shelf-detection/">Retail Shelf Recognition
+— technical deep dive</a></li>
+<li><a href="https://github.com/swd07/ai-platform-portfolio/blob/master/projects//projects/merch-terminal/">Offline Merchandising Terminal —
+field capture deep dive</a></li>
+<li><a href="https://github.com/swd07/ai-platform-portfolio/blob/master/projects//articles/evidence-not-answers/">Article: Evidence, Not
+Answers</a></li>
 </ul>
-<p>For planogram work, the mobile UI can also create/edit <strong>shelf
-zones directly on the image</strong> using interactive drawing, dragging
-and resize handles. This puts structured correction close to the person
-standing in front of the real shelf.</p>
-<p>The key architecture decision is that <strong>field capture is
-decoupled from GPU inference</strong>. Weak store connectivity or a
-temporarily busy model server does not prevent the merchandiser from
-taking the next photo.</p>
-<p>→ <strong><a href="/projects/merch-terminal/">Offline Merchandising Terminal
-— field capture deep dive</a></strong></p>
-<h3 id="recognition-pipeline">Recognition pipeline</h3>
-<p>The recognition stack combines:</p>
-<ul>
-<li>GroundingDINO product detection;</li>
-<li>Qwen2.5-VL OCR / package reading;</li>
-<li>Qwen3-Embedding-8B + Qdrant dense catalog retrieval;</li>
-<li>DINOv2 visual k-NN;</li>
-<li>fine-tuned ArcFace retrieval;</li>
-<li>deterministic multimodal fusion and evidence gates.</li>
-</ul>
-<p>Model and gate changes move through <strong>off → shadow →
-active</strong> using stratified golden sets and pre-defined acceptance
-/ kill thresholds.</p>
-<p>Audited results:</p>
-<ul>
-<li><strong>95.8% brand precision</strong>;</li>
-<li><strong>73.1% SKU precision</strong> end-to-end;</li>
-<li><strong>detector F1 0.68 → 0.91</strong> on unseen shelf
-photos;</li>
-<li><strong>6k+ photos</strong> processed;</li>
-<li>pilot scope of <strong>40 outlets / 3 merchandising
-users</strong>.</li>
-</ul>
-<p>Recognition results feed a merchandising dashboard: share of shelf by
-brand and store (low-share stores flagged), presence of own SKUs across
-stores, price intelligence from price tags (price index vs the market,
-competitor comparison by category) and store markup vs base price.
-Unknown crops go to a review inbox, and confirmed crops extend the
-visual gallery. Shelf zones are captured in the field app, and a
-drift-based compliance check compares each store visit with that store's
-own history (own-share drop, missing anchor products). The engineering
-pipeline is production; market coverage remains pilot-scale.</p>
-<p>→ <strong><a
-href="/projects/retail-shelf-detection/">Authoritative
-Retail Shelf Detection technical case study</a></strong></p>
 <h2 id="ai-agents--operations">AI Agents &amp; Operations</h2>
 <p>The platform includes self-hosted, tool-calling agents rather than
 unconstrained chatbots:</p>
@@ -540,5 +472,5 @@ of code as individual authorship.</p>
 </div>
 <div class="cta"><b>Hiring for applied AI, computer vision, RAG or LLM agents?</b><br>I'm based in Tbilisi and open to new roles. Email <a href="mailto:haraev87@gmail.com">haraev87@gmail.com</a> or message me on <a href="https://t.me/Edharaev">Telegram</a>.</div>
 </main>
-<footer class="site"><div class="wrap">© 2026 Eduard Kharaev · Applied AI Engineer · Tbilisi, Georgia · <a href="mailto:haraev87@gmail.com">haraev87@gmail.com</a> · <a href="https://t.me/Edharaev">Telegram</a> · <a href="https://github.com/swd07">GitHub</a></div></footer>
+<footer class="site"><div class="wrap">© 2026 Eduard Kharaev · <a href="https://github.com/swd07">GitHub</a> · <a href="https://t.me/Edharaev">Telegram</a></div></footer>
 </body></html>
