@@ -12,7 +12,7 @@
 <meta property="og:title" content="Supply Planning Action Agent — case study | Eduard Kharaev">
 <meta property="og:description" content="Embedded self-hosted Qwen agent with 11 bounded tools: planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.">
 <meta property="og:url" content="https://swd07.github.io/projects/operations-agent/">
-<meta property="og:image" content="https://swd07.github.io/assets/evidence-not-answers-banner.jpg">
+<meta property="og:image" content="https://swd07.github.io/assets/supply-planning-agent.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Supply Planning Action Agent — case study | Eduard Kharaev">
 <meta name="twitter:description" content="Embedded self-hosted Qwen agent with 11 bounded tools: planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.">
@@ -87,6 +87,8 @@ footer.site{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);f
 .prose h3{font-size:21px;margin:32px 0 8px}
 .prose h4{font-size:18px;margin:26px 0 6px}
 .prose img{max-width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+.prose figure{margin:0 0 18px}
+.prose figcaption{font-size:14px;color:var(--muted);margin-top:8px}
 .prose blockquote{margin:18px 0;padding:10px 18px;border-left:3px solid var(--accent);background:var(--card);border-radius:0 8px 8px 0;color:var(--muted)}
 .prose code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em;background:var(--code);padding:2px 6px;border-radius:5px}
 .prose pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:14px;line-height:1.55}
@@ -125,6 +127,11 @@ internal network addresses, user identities and company-specific
 commercial data are intentionally omitted. Production code remains
 private.</p>
 </blockquote>
+<figure>
+<img loading="lazy" src="/assets/supply-planning-agent.jpg"
+alt="Supply Planning Action Agent architecture: planner, assistant UI, Qwen agent with policy and tool router, planning data tools, UI action layer, planning workspace and audit trail" />
+<figcaption>Architecture illustration. Production UI is private.</figcaption>
+</figure>
 <h2 id="problem">Problem</h2>
 <p>Planning a distribution operation requires more than a static BI
 dashboard. Commercial and operations teams need to work across product
