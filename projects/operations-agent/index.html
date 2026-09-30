@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Supply Planning Action Agent — case study | Eduard Kharaev</title>
-<meta name="description" content="Embedded self-hosted Qwen agent with 11 bounded tools: planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.">
+<meta name="description" content="Supply-planning platform for BOOMi, a beverage brand client, with an embedded self-hosted Qwen agent: 11 bounded tools for planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.">
 <meta name="author" content="Eduard Kharaev">
 <link rel="canonical" href="https://swd07.github.io/projects/operations-agent/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Eduard Kharaev">
 <meta property="og:title" content="Supply Planning Action Agent — case study | Eduard Kharaev">
-<meta property="og:description" content="Embedded self-hosted Qwen agent with 11 bounded tools: planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.">
+<meta property="og:description" content="Supply-planning platform for BOOMi, a beverage brand client, with an embedded self-hosted Qwen agent: 11 bounded tools for planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.">
 <meta property="og:url" content="https://swd07.github.io/projects/operations-agent/">
 <meta property="og:image" content="https://swd07.github.io/assets/supply-planning-agent.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Supply Planning Action Agent — case study | Eduard Kharaev">
-<meta name="twitter:description" content="Embedded self-hosted Qwen agent with 11 bounded tools: planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.">
+<meta name="twitter:description" content="Supply-planning platform for BOOMi, a beverage brand client, with an embedded self-hosted Qwen agent: 11 bounded tools for planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.">
 <meta name="twitter:image" content="https://swd07.github.io/assets/evidence-not-answers-banner.jpg">
 <meta name="theme-color" content="#0b0f14">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -110,7 +110,7 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 @media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.feature{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.grid{grid-template-columns:1fr}nav{gap:12px;font-size:14px}.hero{padding-top:44px}.prose{font-size:17px}}
 </style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "Supply Planning Action Agent", "headline": "Supply Planning Action Agent", "description": "Embedded self-hosted Qwen agent with 11 bounded tools: planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.", "author": {"@type": "Person", "name": "Eduard Kharaev", "jobTitle": "Applied AI Engineer", "url": "https://swd07.github.io/", "email": "mailto:haraev87@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Tbilisi", "addressCountry": "GE"}, "sameAs": ["https://github.com/swd07", "https://t.me/Edharaev"], "knowsAbout": ["Applied AI", "Computer Vision", "Vision-Language Models", "Retrieval-Augmented Generation", "Vector Search", "LLM Agents", "MLOps", "Self-hosted LLM inference", "vLLM"]}, "url": "https://swd07.github.io/projects/operations-agent/", "image": "https://swd07.github.io/assets/evidence-not-answers-banner.jpg", "dateModified": "2026-09-26"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "Supply Planning Action Agent", "headline": "Supply Planning Action Agent", "description": "Supply-planning platform for BOOMi, a beverage brand client, with an embedded self-hosted Qwen agent: 11 bounded tools for planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.", "author": {"@type": "Person", "name": "Eduard Kharaev", "jobTitle": "Applied AI Engineer", "url": "https://swd07.github.io/", "email": "mailto:haraev87@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Tbilisi", "addressCountry": "GE"}, "sameAs": ["https://github.com/swd07", "https://t.me/Edharaev"], "knowsAbout": ["Applied AI", "Computer Vision", "Vision-Language Models", "Retrieval-Augmented Generation", "Vector Search", "LLM Agents", "MLOps", "Self-hosted LLM inference", "vLLM"]}, "url": "https://swd07.github.io/projects/operations-agent/", "image": "https://swd07.github.io/assets/evidence-not-answers-banner.jpg", "dateModified": "2026-09-26"}</script>
 <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";mermaid.initialize({startOnLoad:true,theme:matchMedia("(prefers-color-scheme: dark)").matches?"dark":"default"});</script>
 </head>
 <body>
@@ -118,7 +118,7 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 <main class="wrap narrow page">
 <div class="crumbs"><a href="/">Home</a> · <a href="/#projects">Projects</a></div>
 <h1>Supply Planning Action Agent</h1>
-<p class="sub">Embedded self-hosted Qwen agent with 11 bounded tools: planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.</p>
+<p class="sub">Supply-planning platform for BOOMi, a beverage brand client, with an embedded self-hosted Qwen agent: 11 bounded tools for planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.</p>
 <p class="meta">Case study by <a href="/">Eduard Kharaev</a> · <a href="https://github.com/swd07/ai-platform-portfolio/blob/master/projects/operations-supply-planning-agent.md">Source on GitHub</a></p>
 <div class="prose">
 <blockquote>
@@ -154,8 +154,7 @@ combination is located.</li>
 <p>The goal was to make the operational platform easier to use without
 turning an LLM into an unrestricted administrator.</p>
 <h2 id="operational-platform">Operational platform</h2>
-<p>The broader private platform provides an operating layer around the
-distribution business, including:</p>
+<p>The broader private platform was built for <strong>BOOMi</strong>, a beverage brand client, and provides an operating layer around its distribution business, including:</p>
 <ul>
 <li>executive operational summary;</li>
 <li>product and operational master data;</li>
@@ -176,9 +175,7 @@ from an explicit registry of tools and returns both natural-language
 output and structured UI actions.</p>
 <p>A typical loop is:</p>
 <p><code>user intent → Qwen tool call → validated tool handler → planning API / UI action → tool result → final answer</code></p>
-<p>Orchestration is a <strong>custom stateful implementation with
-conditional routing</strong> rather than an agent framework, and
-production LLM calls are traced in <strong>Langfuse</strong>.</p>
+<p>Orchestration is a <strong>custom tool-calling loop (up to 4 rounds)</strong> rather than an agent framework.</p>
 <p>The server limits tool execution to a bounded number of rounds and
 falls back to a normal answer when no further action is required.</p>
 <h2 id="11-bounded-tools">11 bounded tools</h2>
@@ -241,9 +238,9 @@ The model therefore cannot decide to call a data operation “as” a
 different user simply by generating another identifier.</p>
 <p>That design reflects a broader rule for tool-using agents:</p>
 <blockquote>
-<p>authorization context belongs to the application boundary, not to the
-language model.</p>
+<p>authorization context belongs to the application boundary, not to the language model.</p>
 </blockquote>
+<p>Mutations were applied right after domain resolution and server-side identity checks; there was no separate confirmation step before writes — the planned next step was human approval for data-changing tools.</p>
 <h2 id="anti-hallucination-behavior">Anti-hallucination behavior</h2>
 <p>The system prompt explicitly instructs the assistant not to invent
 operational numbers. If a tool did not return the required data, the
@@ -333,8 +330,7 @@ intentionally describes its architecture and workflows without exposing
 proprietary commercial data.</p>
 <h2 id="stack">Stack</h2>
 <p><code>Python</code> · <code>FastAPI</code> · <code>Pydantic</code> ·
-<code>self-hosted Qwen</code> · <code>OpenAI-compatible inference</code>
-· <code>Langfuse</code> · <code>REST</code><br />
+<code>self-hosted Qwen</code> · <code>OpenAI-compatible inference</code> · <code>REST</code><br />
 <code>Next.js / React operational UI</code> · <code>PM2</code> ·
 <code>Linux</code> · <code>tool calling</code> ·
 <code>structured UI actions</code></p>

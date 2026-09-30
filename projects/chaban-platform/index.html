@@ -135,7 +135,7 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 <tr><td>Management BI</td><td>13 analytical areas, PPTX management reports</td><td>Directors and supervisors</td></tr>
 <tr><td>Demand forecasting</td><td>Versioned pipeline, walk-forward backtesting, customer allocation</td><td>Per active SKU</td></tr>
 <tr><td>Merchandising AI</td><td>Android field capture + multimodal shelf recognition</td><td>95.8% brand precision, 6k+ photos</td></tr>
-<tr><td>AI agents &amp; operations</td><td>Director, KPI and dashboard agents; infrastructure bot</td><td>Self-hosted on H200, traced in Langfuse</td></tr>
+<tr><td>AI agents &amp; operations</td><td>Director, KPI and dashboard agents; infrastructure bot</td><td>Self-hosted on H200, agent traces evaluated in self-hosted Langfuse</td></tr>
 </tbody>
 </table>
 </div>
@@ -378,13 +378,8 @@ operational tools plus minute-level monitoring and alerts into corporate
 chat;</li>
 <li><strong>Dashboard assistant</strong> — answers from the selected
 dashboard context rather than unrestricted DB access;</li>
-<li><strong>Planning action agent</strong> — 11 bounded planning / UI
-tools on the company's separate supply-planning platform (<a
-href="/projects/operations-agent/">case study</a>).</li>
 </ul>
-<p>Agent orchestration is a custom stateful implementation with
-conditional routing rather than an agent framework, and production LLM
-calls are traced in <strong>Langfuse</strong>.</p>
+<p>Agent orchestration is a custom stateful implementation with conditional routing rather than an agent framework, and agent traces were evaluated in self-hosted <strong>Langfuse</strong>.</p>
 <p>The agent infrastructure is production, but current business adoption
 is low; it should not be represented as a heavily used daily
 workflow.</p>
@@ -456,9 +451,9 @@ PostgreSQL / Redis / Qdrant / MinIO
 1C ERP (JSON inbound + SOAP outbound)
 
 AI / ML host:
-vLLM Qwen2.5-VL-72B + Qwen3.6-35B
+vLLM Qwen3-VL-32B FP8 + Qwen3.6-35B
 Qwen3-Embedding-8B
-GroundingDINO · DINOv2 · ArcFace · OCR · Whisper
+GroundingDINO · DINOv2 · ArcFace · OCR
         ↓
 H200 self-hosted inference</code></pre>
 <h2 id="my-role">My Role</h2>
@@ -482,7 +477,7 @@ of code as individual authorship.</p>
 · <code>Qdrant</code> · <code>MinIO</code> · <code>Kotlin</code> ·
 <code>Jetpack Compose</code> · <code>Room</code> ·
 <code>WorkManager</code> · <code>1C SOAP / JSON integration</code> ·
-<code>vLLM</code> · <code>Qwen2.5-VL</code> · <code>Qwen3.6</code> ·
+<code>vLLM</code> · <code>Qwen3-VL-32B (FP8)</code> · <code>Qwen2.5-VL-72B</code> · <code>Qwen3.6-35B</code> ·
 <code>Qwen3-Embedding</code> · <code>Langfuse</code> ·
 <code>GroundingDINO</code> · <code>DINOv2</code> · <code>ArcFace</code>
 · <code>PyTorch</code> · <code>Prophet</code> · <code>pandas</code> ·

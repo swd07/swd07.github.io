@@ -172,7 +172,7 @@ architecture</h2>
   → object storage + durable analysis queue
   → async analysis worker
   → GroundingDINO detection
-  → Qwen2.5-VL OCR / package reading
+  → Qwen3-VL-32B (FP8) OCR / package reading
   → Qwen3-Embedding-8B
   → Qdrant dense text retrieval
   → attribute-aware reranking
@@ -270,8 +270,7 @@ than the final business metric: a good box can still become an incorrect
 SKU, so downstream retrieval/evidence gates remain mandatory.</p>
 <hr />
 <h2 id="ocr--vlm-evidence">OCR / VLM evidence</h2>
-<p>Each product crop was read by self-hosted
-<strong>Qwen2.5-VL-72B-AWQ</strong> served through vLLM.</p>
+<p>Each product crop was read by self-hosted <strong>Qwen3-VL-32B (FP8)</strong> served through vLLM (<strong>Qwen2.5-VL-72B-AWQ</strong> until the May 2026 cutover; afterwards that model stayed only as an optional shelf-description supplement).</p>
 <p>The VLM extracts evidence such as:</p>
 <ul>
 <li>brand text;</li>
@@ -503,7 +502,7 @@ technical work I did on it personally.</p>
 <hr />
 <h2 id="stack">Stack</h2>
 <p><code>Python</code> · <code>FastAPI</code> · <code>PyTorch</code> ·
-<code>GroundingDINO</code> · <code>Qwen2.5-VL-72B-AWQ</code> ·
+<code>GroundingDINO</code> · <code>Qwen3-VL-32B (FP8)</code> · <code>Qwen2.5-VL-72B-AWQ</code> ·
 <code>Qwen3-Embedding-8B</code> · <code>Qdrant</code> ·
 <code>DINOv2 ViT-L/14</code> · <code>ArcFace</code> · <code>vLLM</code>
 · <code>PostgreSQL</code> · <code>MinIO / S3-compatible storage</code> ·
