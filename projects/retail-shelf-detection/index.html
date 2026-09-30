@@ -133,8 +133,7 @@ rollout</strong>.</p>
 subsystem.</li>
 <li><strong>5,882 completed analyses</strong> in the audited production
 queue.</li>
-<li>Current rollout: <strong>40 retail outlets / 3 merchandising
-users</strong>.</li>
+<li>Rollout as of August 2026: <strong>40 retail outlets / 3 merchandising users</strong>.</li>
 <li><strong>~320k OCR calls</strong> processed by the production
 service.</li>
 <li><strong>~108k ArcFace shadow evaluations</strong> recorded.</li>
@@ -271,7 +270,7 @@ than the final business metric: a good box can still become an incorrect
 SKU, so downstream retrieval/evidence gates remain mandatory.</p>
 <hr />
 <h2 id="ocr--vlm-evidence">OCR / VLM evidence</h2>
-<p>Each product crop is read by self-hosted
+<p>Each product crop was read by self-hosted
 <strong>Qwen2.5-VL-72B-AWQ</strong> served through vLLM.</p>
 <p>The VLM extracts evidence such as:</p>
 <ul>
@@ -403,8 +402,7 @@ and guardrails.</li>
 the audited benchmark.</li>
 <li>DINOv2 baseline on the same benchmark: <strong>26.4%
 Recall@1</strong>.</li>
-<li>Human readability ceiling on the unresolved tail: <strong>76.4% ±
-5.8 pp</strong> under a blind, pre-registered protocol.</li>
+<li>Overall brand-readability ceiling: <strong>76.4% ± 5.8 pp</strong> under a blind, pre-registered protocol — a <strong>65.5%</strong> expert read-rate on the unresolved tail, on top of the 31.6% the pipeline already identified.</li>
 </ul>
 <h3 id="production-telemetry">Production telemetry</h3>
 <ul>
