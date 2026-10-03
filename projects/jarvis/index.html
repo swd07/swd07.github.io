@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jarvis — Voice Multi-Agent Orchestrator — case study | Eduard Kharaev</title>
+<title>Jarvis · Voice Multi-Agent Orchestrator · case study | Eduard Kharaev</title>
 <meta name="description" content="Real-time voice interface over a fleet of agents: WebRTC, agent registry and command queue, role-based capabilities and allowlisted browser actions.">
 <meta name="author" content="Eduard Kharaev">
 <link rel="canonical" href="https://swd07.github.io/projects/jarvis/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Eduard Kharaev">
-<meta property="og:title" content="Jarvis — Voice Multi-Agent Orchestrator — case study | Eduard Kharaev">
+<meta property="og:title" content="Jarvis · Voice Multi-Agent Orchestrator · case study | Eduard Kharaev">
 <meta property="og:description" content="Real-time voice interface over a fleet of agents: WebRTC, agent registry and command queue, role-based capabilities and allowlisted browser actions.">
 <meta property="og:url" content="https://swd07.github.io/projects/jarvis/">
 <meta property="og:image" content="https://swd07.github.io/assets/jarvis-command-center.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Jarvis — Voice Multi-Agent Orchestrator — case study | Eduard Kharaev">
+<meta name="twitter:title" content="Jarvis · Voice Multi-Agent Orchestrator · case study | Eduard Kharaev">
 <meta name="twitter:description" content="Real-time voice interface over a fleet of agents: WebRTC, agent registry and command queue, role-based capabilities and allowlisted browser actions.">
 <meta name="twitter:image" content="https://swd07.github.io/assets/jarvis-command-center.jpg">
 <meta name="theme-color" content="#0b0f14">
@@ -108,14 +108,14 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 @media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.feature{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.grid{grid-template-columns:1fr}nav{gap:12px;font-size:14px}.hero{padding-top:44px}.prose{font-size:17px}}
 </style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "Jarvis — Voice Multi-Agent Orchestrator", "headline": "Jarvis — Voice Multi-Agent Orchestrator", "description": "Real-time voice interface over a fleet of agents: WebRTC, agent registry and command queue, role-based capabilities and allowlisted browser actions.", "author": {"@type": "Person", "name": "Eduard Kharaev", "jobTitle": "Applied AI Engineer", "url": "https://swd07.github.io/", "email": "mailto:haraev87@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Tbilisi", "addressCountry": "GE"}, "sameAs": ["https://github.com/swd07", "https://t.me/Edharaev"], "knowsAbout": ["Applied AI", "Computer Vision", "Vision-Language Models", "Retrieval-Augmented Generation", "Vector Search", "LLM Agents", "MLOps", "Self-hosted LLM inference", "vLLM"]}, "url": "https://swd07.github.io/projects/jarvis/", "image": "https://swd07.github.io/assets/jarvis-command-center.jpg", "dateModified": "2026-09-26"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "Jarvis · Voice Multi-Agent Orchestrator", "headline": "Jarvis · Voice Multi-Agent Orchestrator", "description": "Real-time voice interface over a fleet of agents: WebRTC, agent registry and command queue, role-based capabilities and allowlisted browser actions.", "author": {"@type": "Person", "name": "Eduard Kharaev", "jobTitle": "Applied AI Engineer", "url": "https://swd07.github.io/", "email": "mailto:haraev87@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Tbilisi", "addressCountry": "GE"}, "sameAs": ["https://github.com/swd07", "https://t.me/Edharaev"], "knowsAbout": ["Applied AI", "Computer Vision", "Vision-Language Models", "Retrieval-Augmented Generation", "Vector Search", "LLM Agents", "MLOps", "Self-hosted LLM inference", "vLLM"]}, "url": "https://swd07.github.io/projects/jarvis/", "image": "https://swd07.github.io/assets/jarvis-command-center.jpg", "dateModified": "2026-09-26"}</script>
 <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";mermaid.initialize({startOnLoad:true,theme:matchMedia("(prefers-color-scheme: dark)").matches?"dark":"default"});</script>
 </head>
 <body>
 <header class="site"><div class="wrap"><a class="brand" href="/">Eduard <span>Kharaev</span></a><nav><a href="/#writing">Writing</a><a href="/#projects">Projects</a><a href="/#contact">Contact</a></nav></div></header>
 <main class="wrap narrow page">
 <div class="crumbs"><a href="/">Home</a> · <a href="/#projects">Projects</a></div>
-<h1>Jarvis — Voice Multi-Agent Orchestrator</h1>
+<h1>Jarvis · Voice Multi-Agent Orchestrator</h1>
 <p class="sub">Real-time voice interface over a fleet of agents: WebRTC, agent registry and command queue, role-based capabilities and allowlisted browser actions.</p>
 <p class="meta">Case study by <a href="/">Eduard Kharaev</a> · <a href="https://github.com/swd07/ai-platform-portfolio/blob/master/projects/jarvis.md">Source on GitHub</a></p>
 <div class="prose">
@@ -217,8 +217,7 @@ initiative.</li>
 relying on the LLM to remember project status from conversation. That
 keeps executive answers grounded in current data.</p>
 <h2 id="safe-browser-control">Safe browser control</h2>
-<p>Jarvis can also open internal products and dashboards from a voice
-request — for example project pages, dashboards, merchandising, KPI,
+<p>Jarvis can also open internal products and dashboards from a voice request, for example project pages, dashboards, merchandising, KPI,
 planning/forecasting or the operations control panel.</p>
 <p>Browser control is intentionally <strong>allowlisted by named
 target</strong>. The LLM cannot supply an arbitrary URL. Jarvis places
@@ -329,8 +328,7 @@ about building a practical <strong>human-to-agent orchestration layer
 for a production AI platform</strong>.</p>
 
 </div>
-<div class="cta"><b>Hiring for applied AI, computer vision, RAG or LLM agents?</b><br>I'm based in Tbilisi and open to new roles. Email <a href="mailto:haraev87@gmail.com">haraev87@gmail.com</a> or message me on <a href="https://t.me/Edharaev">Telegram</a>.</div>
 </main>
-<footer class="site"><div class="wrap">© 2026 Eduard Kharaev · <a href="https://github.com/swd07">GitHub</a> · <a href="https://t.me/Edharaev">Telegram</a></div></footer>
+<footer class="site"><div class="wrap">Eduard Kharaev · Applied AI Engineer · Tbilisi<br><a href="mailto:haraev87@gmail.com">Email</a> · <a href="https://t.me/Edharaev">Telegram</a> · <a href="https://github.com/swd07">GitHub</a></div></footer>
 <script data-goatcounter="https://swd07.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

@@ -161,7 +161,7 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 
 <p>In parallel, price tags are detected, read by a VLM and linked to the nearest product box.</p>
 
-<p>A note on terms: below, "OCR" means the text a vision-language model reads from each product crop. We used Qwen-VL as our OCR engine — first Qwen2.5-VL-72B, later Qwen3-VL-32B in FP8 — with EasyOCR as a fallback. Reading text is exactly the kind of narrow task where a VLM is excellent. Deciding which product it is was a different story.</p>
+<p>A note on terms: below, "OCR" means the text a vision-language model reads from each product crop. We used Qwen-VL as our OCR engine (first Qwen2.5-VL-72B, later Qwen3-VL-32B in FP8) with EasyOCR as a fallback. Reading text is exactly the kind of narrow task where a VLM is excellent. Deciding which product it is was a different story.</p>
 
 <p>Analysis is asynchronous. A photo takes roughly 10–30 seconds to process, but the merchandiser never waits: the app stores photos locally and uploads them when the network is available. Capture is decoupled from inference.</p>
 
@@ -187,7 +187,7 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 
 <p>Second, the VLM's own confidence is not used anywhere. In one of our audits we wrote down a blunt note: the model's self-reported confidence was "always high." It was useless as a signal. What the model reads from the package, such as a weight or a brand, can be checked against the catalog. How confident the model feels cannot.</p>
 
-<p>On our golden set — hundreds of field photos, labelled across stores and re-labelled over six months, matched at IoU 0.5 — the full pipeline reached <b>95.8% brand precision and 73.1% SKU precision end to end.</b> We measured brand and SKU separately because they serve different reports: share of shelf needs the brand, assortment analysis needs the exact SKU.</p>
+<p>On our golden set (hundreds of field photos, labelled across stores and re-labelled over six months, matched at IoU 0.5) the full pipeline reached <b>95.8% brand precision and 73.1% SKU precision end to end.</b> We measured brand and SKU separately because they serve different reports: share of shelf needs the brand, assortment analysis needs the exact SKU.</p>
 
 <h2>Principle 2: Solve siblings with specific evidence, not a bigger model</h2>
 
@@ -199,13 +199,13 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 
 <p><b>Package form from the VLM.</b> We asked the VLM one narrow question: what is the package type? On audited results it was correct in 92.7% of cases. But we measured it per package type and kept it only where it was reliable: PET bottles and buckets were at 93% on 401 crops. One package type was switched off after an audit of 313 decisions, and families that include canisters were excluded completely, because the model confused canisters with PET bottles.</p>
 
-<p><b>The price tag: useful, but never a vote on identity.</b> A price tag carries the product name, weight, fat percentage and price, so it is tempting to use it to identify the product. We deliberately did not. In real stores tags are often outdated, or belong to the product that stood there last week. So the tag answers one question only — what does this product cost — and never changes which product the system thinks it is.</p>
+<p><b>The price tag: useful, but never a vote on identity.</b> A price tag carries the product name, weight, fat percentage and price, so it is tempting to use it to identify the product. We deliberately did not. In real stores tags are often outdated, or belong to the product that stood there last week. So the tag answers one question only, what does this product cost, and never changes which product the system thinks it is.</p>
 
 <p>The pattern is the same every time: a narrow question, a measured answer, and a scope limited to where the measurement holds.</p>
 
 <h2>Principle 3: "Unknown" needs a reason, and the reason needs a fix</h2>
 
-<p>Returning "unknown" is only useful if you know <i>why</i>. Every unknown box in our system got one of 19 reason codes, and every code pointed to a lever — the thing that would actually fix it. The main groups:</p>
+<p>Returning "unknown" is only useful if you know <i>why</i>. Every unknown box in our system got one of 19 reason codes, and every code pointed to a lever, the thing that would actually fix it. The main groups:</p>
 
 <ul>
 <li><b>OCR empty or unreadable</b> → improve photo quality.</li>
@@ -219,11 +219,11 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 
 <p>Siblings look alike; that is the whole problem. More images of similar packages do not separate them. The real lever was text: weight and flavor from OCR. We stopped investing in gallery seeding for this class of errors.</p>
 
-<p>We also learned that a reason code can hide problems. One code, "brand mismatch — healthy reject," looked like the system working correctly. An audit showed that it was also hiding catalog gaps and false rejections. We split it into subclasses so each one pointed to a real fix.</p>
+<p>We also learned that a reason code can hide problems. One code, "brand mismatch, healthy reject," looked like the system working correctly. An audit showed that it was also hiding catalog gaps and false rejections. We split it into subclasses so each one pointed to a real fix.</p>
 
 <p>Unknown boxes also went to a review inbox. When a reviewer confirmed a product, the crop was added to the confirmed visual gallery. The system improved on its own failure cases without retraining any model.</p>
 
-<h2>Principle 4: Guardrails can hurt too — ship them in shadow mode first</h2>
+<h2>Principle 4: Guardrails can hurt too, so ship them in shadow mode first</h2>
 
 <p>Guardrails sound safe. They are not automatically safe.</p>
 
@@ -241,7 +241,7 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 <li>the box, detector confidence and the OCR text;</li>
 <li>the brand and attributes read from the package;</li>
 <li>the catalog search score and the visual distance;</li>
-<li>the match source — which rule made the decision;</li>
+<li>the match source: which rule made the decision;</li>
 <li>guardrail verdicts and the reason for any unknown;</li>
 <li>the thresholds that were active at that moment.</li>
 </ul>
@@ -263,7 +263,7 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 
 <p>I am not against VLMs. We used one in production every day. But the question is not "is the model good?". The question is "what happens when it is wrong, and will anyone notice?".</p>
 
-<p>I would let a VLM make the final decision when errors are cheap, visible and easy to correct — for example, a draft description that a human reviews. I would not let it decide when errors are silent and flow into numbers that people trust, like share of shelf, prices or stock.</p>
+<p>I would let a VLM make the final decision when errors are cheap, visible and easy to correct, for example a draft description that a human reviews. I would not let it decide when errors are silent and flow into numbers that people trust, like share of shelf, prices or stock.</p>
 
 <p>In those systems, the architecture is the product: narrow questions to the model, evidence you can check, rules you can read, "unknown" with a reason, and every change measured in shadow mode before it goes live.</p>
 
@@ -271,12 +271,11 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 
 <p><i>The technical case study, with the architecture and runnable examples, is on GitHub: <a href="https://github.com/swd07/retail-shelf-detection">github.com/swd07/retail-shelf-detection</a></i></p>
 
-<p><i>I'm Eduard Kharaev, an applied AI engineer. I build production AI systems: retrieval, computer vision, self-hosted LLMs and agents with strict boundaries. I'm based in Tbilisi and open to new roles. You can reach me at haraev87@gmail.com or on Telegram: @Edharaev.</i></p>
+<p><i>I'm Eduard Kharaev, an applied AI engineer. I build production AI systems: retrieval, computer vision, self-hosted LLMs and agents with strict boundaries. I'm based in Tbilisi and available for contract work. You can reach me at haraev87@gmail.com or on Telegram: @Edharaev.</i></p>
 
 </div>
 </article>
-<div class="cta"><b>Hiring for applied AI, computer vision, RAG or LLM agents?</b><br>I'm based in Tbilisi and open to new roles. Email <a href="mailto:haraev87@gmail.com">haraev87@gmail.com</a> or message me on <a href="https://t.me/Edharaev">Telegram</a>.</div>
 </main>
-<footer class="site"><div class="wrap">© 2026 Eduard Kharaev · <a href="https://github.com/swd07">GitHub</a> · <a href="https://t.me/Edharaev">Telegram</a></div></footer>
+<footer class="site"><div class="wrap">Eduard Kharaev · Applied AI Engineer · Tbilisi<br><a href="mailto:haraev87@gmail.com">Email</a> · <a href="https://t.me/Edharaev">Telegram</a> · <a href="https://github.com/swd07">GitHub</a></div></footer>
 <script data-goatcounter="https://swd07.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

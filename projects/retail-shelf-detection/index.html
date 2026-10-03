@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Retail Shelf Recognition — case study | Eduard Kharaev</title>
+<title>Retail Shelf Recognition · case study | Eduard Kharaev</title>
 <meta name="description" content="Production multimodal recognition of products on store shelves: GroundingDINO, Qwen-VL OCR, Qdrant retrieval, DINOv2 and ArcFace, deterministic fusion, guardrails and explicit unknowns.">
 <meta name="author" content="Eduard Kharaev">
 <link rel="canonical" href="https://swd07.github.io/projects/retail-shelf-detection/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Eduard Kharaev">
-<meta property="og:title" content="Retail Shelf Recognition — case study | Eduard Kharaev">
+<meta property="og:title" content="Retail Shelf Recognition · case study | Eduard Kharaev">
 <meta property="og:description" content="Production multimodal recognition of products on store shelves: GroundingDINO, Qwen-VL OCR, Qdrant retrieval, DINOv2 and ArcFace, deterministic fusion, guardrails and explicit unknowns.">
 <meta property="og:url" content="https://swd07.github.io/projects/retail-shelf-detection/">
 <meta property="og:image" content="https://swd07.github.io/assets/shelf-detection-live.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Retail Shelf Recognition — case study | Eduard Kharaev">
+<meta name="twitter:title" content="Retail Shelf Recognition · case study | Eduard Kharaev">
 <meta name="twitter:description" content="Production multimodal recognition of products on store shelves: GroundingDINO, Qwen-VL OCR, Qdrant retrieval, DINOv2 and ArcFace, deterministic fusion, guardrails and explicit unknowns.">
 <meta name="twitter:image" content="https://swd07.github.io/assets/shelf-detection-live.jpg">
 <meta name="theme-color" content="#0b0f14">
@@ -144,8 +144,8 @@ intentionally limited.</p>
 <h2 id="problem">Problem</h2>
 <p>A shelf photo has to become trustworthy commercial data:</p>
 <ul>
-<li><strong>share of shelf</strong> — own brand vs competitors;</li>
-<li><strong>assortment coverage</strong> — which brands/SKUs are
+<li><strong>share of shelf</strong>: own brand vs competitors;</li>
+<li><strong>assortment coverage</strong>: which brands/SKUs are
 present;</li>
 <li><strong>package / format / size mix</strong>;</li>
 <li><strong>price-tag evidence</strong>;</li>
@@ -189,8 +189,7 @@ textual and package evidence; the final identity is selected by a
 deterministic decision layer that combines independent retrieval and
 visual signals.</p>
 <hr />
-<h2 id="field-product--offline-first-android-terminal">Field product —
-offline-first Android terminal</h2>
+<h2 id="field-product--offline-first-android-terminal">Field product: offline-first Android terminal</h2>
 <p>The merchandising terminal is a native <strong>Kotlin / Jetpack
 Compose</strong> application built for actual store conditions rather
 than a thin camera screen.</p>
@@ -332,8 +331,8 @@ and 9.1k ArcFace references in the audited retrieval configuration).</p>
 → visual retrieval
 → weak evidence
 → unknown</code></pre>
-<p>Every final prediction stores enough provenance — decision path,
-scores, thresholds and supporting signals — to reconstruct why the
+<p>Every final prediction stores enough provenance (decision path,
+scores, thresholds and supporting signals) to reconstruct why the
 system made that decision.</p>
 <hr />
 <h2 id="deterministic-fusion-and-guardrails">Deterministic fusion and
@@ -401,7 +400,7 @@ and guardrails.</li>
 the audited benchmark.</li>
 <li>DINOv2 baseline on the same benchmark: <strong>26.4%
 Recall@1</strong>.</li>
-<li>Overall brand-readability ceiling: <strong>76.4% ± 5.8 pp</strong> under a blind, pre-registered protocol — a <strong>65.5%</strong> expert read-rate on the unresolved tail, on top of the 31.6% the pipeline already identified.</li>
+<li>Overall brand-readability ceiling: <strong>76.4% ± 5.8 pp</strong> under a blind, pre-registered protocol, a <strong>65.5%</strong> expert read-rate on the unresolved tail, on top of the 31.6% the pipeline already identified.</li>
 </ul>
 <h3 id="production-telemetry">Production telemetry</h3>
 <ul>
@@ -416,20 +415,20 @@ queue.</li>
 <p>Recognition results are not the end product. They feed a
 merchandising dashboard in the AI Analytical Platform:</p>
 <ul>
-<li><strong>Share of shelf</strong> — own vs competitor share by
+<li><strong>Share of shelf</strong>: own vs competitor share by
 facings, per photo, store and brand; stores below 30% own share are
 flagged; shelf position (top / eye / middle / bottom) is recorded.</li>
-<li><strong>SKU presence</strong> — for each own SKU: in how many
+<li><strong>SKU presence</strong>: for each own SKU: in how many
 analysed stores it was found, its facings, and a good / warning /
 critical status.</li>
-<li><strong>Price intelligence from price tags</strong> — own average
+<li><strong>Price intelligence from price tags</strong>: own average
 shelf price vs the market, a price index, per-category comparison with
 competitor brands and price spread across stores.</li>
-<li><strong>Store markup</strong> — shelf price vs base price per store
+<li><strong>Store markup</strong>: shelf price vs base price per store
 and SKU, with a high / normal / low markup status.</li>
-<li><strong>RRP vs shelf price</strong> — recommended retail prices
+<li><strong>RRP vs shelf price</strong>: recommended retail prices
 compared with the prices actually read from price tags.</li>
-<li><strong>Assortment coverage</strong> — which own products and
+<li><strong>Assortment coverage</strong>: which own products and
 attributes are covered in each store, with coverage gaps and competitor
 presence.</li>
 </ul>
@@ -447,13 +446,13 @@ model.</p>
 <h3 id="store-compliance-and-monitoring">Store compliance and
 monitoring</h3>
 <ul>
-<li><strong>Drift-based compliance</strong> — after each store visit,
+<li><strong>Drift-based compliance</strong>: after each store visit,
 the shelf is compared with that store's own recent history (median and
 IQR over previous visits). Rules flag a drop in own share of shelf or
 missing anchor products, and stores are ranked
 <code>ok / warning / critical / insufficient_data</code>, critical
 first.</li>
-<li><strong>Operational alerts</strong> — every 15 minutes a monitor
+<li><strong>Operational alerts</strong>: every 15 minutes a monitor
 checks photo flow, the share of unknown products and pipeline health,
 and alerts the team chat.</li>
 </ul>
@@ -461,7 +460,7 @@ and alerts the team chat.</li>
 business alerts such as "own share dropped in store N". Report export is
 also not in production.</p>
 <hr />
-<h2 id="what-this-is--and-is-not">What this is — and is not</h2>
+<h2 id="what-this-is--and-is-not">What this is, and what it is not</h2>
 <p>This is a <strong>production retrieval-augmented recognition system
 embedded in a field workflow</strong>.</p>
 <p>It is <strong>not</strong> a classic document-question-answering RAG
@@ -527,15 +526,13 @@ crops.</p>
 <ul>
 <li><a
 href="/projects/merch-terminal/">Offline
-field terminal</a> — durable mobile queue, reconnect recovery, shelf
+field terminal</a>: durable mobile queue, reconnect recovery, shelf
 cache and planogram zones.</li>
-<li><a href="https://github.com/swd07/retail-shelf-detection/blob/main/docs/human-ceiling.md">Expert-readability ceiling</a> —
-blind protocol, ceiling calculation, intervals and limitations.</li>
-<li><a href="https://github.com/swd07/retail-shelf-detection/blob/main/docs/evaluation.md">Evaluation honesty</a> —
-population-level validation and grouped splits.</li>
-<li><a href="https://github.com/swd07/retail-shelf-detection/blob/main/docs/production-lessons.md">Production lessons</a> — shadow
+<li><a href="https://github.com/swd07/retail-shelf-detection/blob/main/docs/human-ceiling.md">Expert-readability ceiling</a>: blind protocol, ceiling calculation, intervals and limitations.</li>
+<li><a href="https://github.com/swd07/retail-shelf-detection/blob/main/docs/evaluation.md">Evaluation honesty</a>: population-level validation and grouped splits.</li>
+<li><a href="https://github.com/swd07/retail-shelf-detection/blob/main/docs/production-lessons.md">Production lessons</a>: shadow
 rollout, pre-registered gates and config-drift prevention.</li>
-<li><a href="https://github.com/swd07/retail-shelf-detection/blob/main/docs/metric-learning.md">Metric learning</a> — ArcFace
+<li><a href="https://github.com/swd07/retail-shelf-detection/blob/main/docs/metric-learning.md">Metric learning</a>: ArcFace
 shelf retrieval, gallery doctrine and rejected candidates.</li>
 </ul>
 <hr />
@@ -548,14 +545,13 @@ Solutions Architecture portfolio</a></strong></li>
 href="/projects/chaban-platform/">AI
 Analytical Platform case study</a></strong></li>
 </ul>
-<p>Author: <strong>Eduard Kharaev</strong> — <a
+<p>Author: <strong>Eduard Kharaev</strong> · <a
 href="https://github.com/swd07">GitHub profile</a> · <a
 href="mailto:haraev87@gmail.com"><span>haraev87@gmail.com</span></a> ·
 Telegram <a href="https://t.me/Edharaev">@Edharaev</a></p>
 
 </div>
-<div class="cta"><b>Hiring for applied AI, computer vision, RAG or LLM agents?</b><br>I'm based in Tbilisi and open to new roles. Email <a href="mailto:haraev87@gmail.com">haraev87@gmail.com</a> or message me on <a href="https://t.me/Edharaev">Telegram</a>.</div>
 </main>
-<footer class="site"><div class="wrap">© 2026 Eduard Kharaev · <a href="https://github.com/swd07">GitHub</a> · <a href="https://t.me/Edharaev">Telegram</a></div></footer>
+<footer class="site"><div class="wrap">Eduard Kharaev · Applied AI Engineer · Tbilisi<br><a href="mailto:haraev87@gmail.com">Email</a> · <a href="https://t.me/Edharaev">Telegram</a> · <a href="https://github.com/swd07">GitHub</a></div></footer>
 <script data-goatcounter="https://swd07.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>
