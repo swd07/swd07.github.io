@@ -113,10 +113,10 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 .mrow::before,.mrow::after{content:"";position:absolute;top:0;bottom:0;width:120px;z-index:2;pointer-events:none}
 .mrow::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
 .mrow::after{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
-.mtrack{display:flex;gap:18px;width:max-content;padding:6px 0;animation:mq 60s linear infinite}
-.mrow.right .mtrack{animation-direction:reverse}
-.mrow:hover .mtrack,.mrow:focus-within .mtrack{animation-play-state:paused}
-@keyframes mq{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 9px))}}
+.mtrack{display:flex;gap:18px;padding:6px 0;overflow-x:auto;scrollbar-width:none;cursor:grab;-webkit-user-select:none;user-select:none}
+.mtrack::-webkit-scrollbar{display:none}
+.mtrack.dragging{cursor:grabbing}
+.mtrack img{-webkit-user-drag:none}
 .pcard{flex:0 0 340px;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;color:var(--fg);transition:border-color .2s,transform .3s}
 .pcard:hover{text-decoration:none;border-color:var(--accent);transform:translateY(-4px)}
 .pthumb{position:relative;aspect-ratio:16/10;overflow:hidden;background:radial-gradient(circle at 30% 20%,rgba(45,212,191,.28),transparent 60%),radial-gradient(circle at 80% 90%,rgba(56,189,248,.22),transparent 55%),#0d151d;display:flex;align-items:center;justify-content:center}
@@ -129,7 +129,7 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 .pbody .tags{margin-top:auto;padding-top:4px;flex-wrap:nowrap;overflow:hidden}
 .pbody h3{font-size:17px;line-height:1.3;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pbody p{font-size:14px;line-height:1.55;color:var(--muted);margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-@media (max-width:760px),(prefers-reduced-motion:reduce){.mtrack{animation:none;width:auto;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 20px;scroll-padding-inline:20px;scrollbar-width:none}.mtrack::-webkit-scrollbar{display:none}.mtrack [aria-hidden="true"]{display:none}.pcard{scroll-snap-align:start}.mrow::before,.mrow::after{display:none}}
+@media (max-width:760px),(prefers-reduced-motion:reduce){.mtrack{scroll-snap-type:x mandatory;padding:6px 20px;scroll-padding-inline:20px;scrollbar-width:none}.mtrack::-webkit-scrollbar{display:none}.mtrack [aria-hidden="true"]{display:none}.pcard{scroll-snap-align:start}.mrow::before,.mrow::after{display:none}}
 @media (max-width:560px){.pcard{flex-basis:84vw}}
 @media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.feature{grid-template-columns:1fr}.areas{grid-template-columns:repeat(2,1fr)}
 /* Narrow screens: the face would sit under the text, so the overlay goes almost solid. */
@@ -208,5 +208,53 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 </div></section>
 </main>
 <footer class="site"><div class="wrap">Eduard Kharaev · Applied AI Engineer · Tbilisi<br><a href="mailto:haraev87@gmail.com">Email</a> · <a href="https://t.me/Edharaev">Telegram</a> · <a href="https://github.com/swd07">GitHub</a></div></footer>
+<script>
+/* Project carousel: auto-scrolls on wide screens, pauses on hover, drag with the mouse. */
+(function(){
+  var auto=matchMedia('(min-width:761px) and (prefers-reduced-motion:no-preference)');
+  var SPEED=30; // px per second
+  document.querySelectorAll('.mrow').forEach(function(row){
+    var t=row.querySelector('.mtrack'), dir=row.classList.contains('right')?-1:1;
+    var originals=[].filter.call(t.children,function(c){return !c.hasAttribute('aria-hidden')});
+    var n=originals.length, period=0, pos=0, paused=false, drag=null, moved=0, last=0;
+    function measure(){period=t.children[n].offsetLeft-t.children[0].offsetLeft}
+    function fill(){ // enough copies so the loop never shows an empty edge on wide screens
+      measure();
+      while(t.scrollWidth<period*2+t.clientWidth){
+        originals.forEach(function(c){var k=c.cloneNode(true);k.setAttribute('aria-hidden','true');k.tabIndex=-1;t.appendChild(k)});
+      }
+    }
+    function wrap(){if(period){while(pos<0)pos+=period;while(pos>=period)pos-=period}}
+    function set(){wrap();t.scrollLeft=pos}
+    function tick(now){
+      var dt=last?Math.min(now-last,100)/1000:0; last=now;
+      if(auto.matches&&!paused&&!drag){pos+=dir*SPEED*dt;set()}
+      requestAnimationFrame(tick);
+    }
+    t.addEventListener('scroll',function(){if(Math.abs(t.scrollLeft-pos)>1){pos=t.scrollLeft;if(auto.matches)set()}},{passive:true});
+    row.addEventListener('mouseenter',function(){paused=true});
+    row.addEventListener('mouseleave',function(){paused=false});
+    row.addEventListener('focusin',function(){paused=true});
+    row.addEventListener('focusout',function(){paused=false});
+    t.addEventListener('pointerdown',function(e){
+      if(e.pointerType!=='mouse'||e.button!==0)return;
+      drag={x:e.clientX,start:t.scrollLeft}; moved=0;
+    });
+    addEventListener('pointermove',function(e){
+      if(!drag)return;
+      var dx=e.clientX-drag.x; moved=Math.max(moved,Math.abs(dx));
+      if(moved>4)t.classList.add('dragging');
+      pos=drag.start-dx; if(auto.matches)set(); else t.scrollLeft=pos;
+    });
+    addEventListener('pointerup',function(){if(drag){drag=null;t.classList.remove('dragging')}});
+    t.addEventListener('click',function(e){if(moved>4){e.preventDefault();e.stopPropagation()}moved=0},true);
+    t.addEventListener('dragstart',function(e){e.preventDefault()});
+    function init(){if(auto.matches){fill();if(dir<0)pos=period;set()}}
+    init(); addEventListener('resize',function(){if(auto.matches){fill();set()}});
+    auto.addEventListener&&auto.addEventListener('change',init);
+    requestAnimationFrame(tick);
+  });
+})();
+</script>
 <script data-goatcounter="https://swd07.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>
