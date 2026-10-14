@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Eduard Kharaev · Applied AI Engineer (Computer Vision, RAG, LLM Agents) | Tbilisi</title>
-<meta name="description" content="I build AI systems that run in real business operations and make them reliable enough that people trust the numbers.">
+<title>Eduard Kharaev · Applied AI Engineer, AI Agents, Automation, AI Solutions Architect</title>
+<meta name="description" content="I design and build AI systems that companies run their daily operations on: AI agents, automation, analytics and computer vision.">
 <meta name="author" content="Eduard Kharaev">
 <link rel="canonical" href="https://swd07.github.io/">
 <meta property="og:type" content="profile">
 <meta property="og:site_name" content="Eduard Kharaev">
-<meta property="og:title" content="Eduard Kharaev · Applied AI Engineer (Computer Vision, RAG, LLM Agents) | Tbilisi">
-<meta property="og:description" content="I build AI systems that run in real business operations and make them reliable enough that people trust the numbers.">
+<meta property="og:title" content="Eduard Kharaev · Applied AI Engineer, AI Agents, Automation, AI Solutions Architect">
+<meta property="og:description" content="I design and build AI systems that companies run their daily operations on: AI agents, automation, analytics and computer vision.">
 <meta property="og:url" content="https://swd07.github.io/">
 <meta property="og:image" content="https://swd07.github.io/assets/evidence-not-answers-banner.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Eduard Kharaev · Applied AI Engineer (Computer Vision, RAG, LLM Agents) | Tbilisi">
-<meta name="twitter:description" content="I build AI systems that run in real business operations and make them reliable enough that people trust the numbers.">
+<meta name="twitter:title" content="Eduard Kharaev · Applied AI Engineer, AI Agents, Automation, AI Solutions Architect">
+<meta name="twitter:description" content="I design and build AI systems that companies run their daily operations on: AI agents, automation, analytics and computer vision.">
 <meta name="twitter:image" content="https://swd07.github.io/assets/evidence-not-answers-banner.jpg">
 <meta name="google-site-verification" content="pJQfQ71026QNNNSpVjKV6B8yvOqrDDngRq8Ah-nGTRo" />
 <meta name="theme-color" content="#0b0f14">
@@ -42,16 +42,18 @@ nav a{color:var(--muted)}
 .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);padding:4px 12px;border-radius:999px}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
 .hero h1{font-size:clamp(38px,7vw,64px);line-height:1.05;letter-spacing:-.03em;margin:18px 0 8px}
-.hero .role{font-size:clamp(19px,3vw,24px);line-height:1.4;color:var(--muted);margin:0 0 20px}
+.hero .role{max-width:600px;font-size:clamp(19px,3vw,24px);line-height:1.4;color:var(--muted);margin:0 0 20px}
+.hero .role .nw{white-space:nowrap}
 .hero p.lead{max-width:680px;font-size:18px;margin:0 0 28px}
 .btns{display:flex;flex-wrap:wrap;gap:12px}
 .btn{display:inline-block;padding:11px 20px;border-radius:10px;font-weight:600;font-size:15px;border:1px solid var(--line);color:var(--fg);background:var(--card)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#04201c}
 .btn:hover{text-decoration:none;filter:brightness(1.08)}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:44px 0 8px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
-.stat b{display:block;font-size:30px;letter-spacing:-.02em;color:var(--fg)}
-.stat span{font-size:14px;color:var(--muted)}
+.areas{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:44px 0 8px}
+.area{display:flex;flex-direction:column;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.area h3{font-size:18px;line-height:1.3;letter-spacing:-.01em;margin:0}
+.area p{font-size:14px;line-height:1.55;color:var(--muted);margin:0;flex:1}
+.area b{display:block;font-size:15px;line-height:1.4;letter-spacing:-.01em;color:var(--accent);padding-top:10px;border-top:1px solid var(--line)}
 section{padding:36px 0}
 h2.sec{font-size:28px;letter-spacing:-.02em;margin:0 0 6px}
 p.sec-sub{color:var(--muted);margin:0 0 22px}
@@ -106,10 +108,33 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 .mini:hover{text-decoration:none;border-color:var(--accent)}
 .mini h3{font-size:17px;margin:0}
 .mini p{font-size:14.5px;color:var(--muted);margin:0}
-@media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.feature{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}
+.marquee{display:flex;flex-direction:column;gap:18px;padding:4px 0}
+.mrow{position:relative;overflow:hidden}
+.mrow::before,.mrow::after{content:"";position:absolute;top:0;bottom:0;width:120px;z-index:2;pointer-events:none}
+.mrow::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+.mrow::after{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
+.mtrack{display:flex;gap:18px;width:max-content;padding:6px 0;animation:mq 60s linear infinite}
+.mrow.right .mtrack{animation-direction:reverse}
+.mrow:hover .mtrack,.mrow:focus-within .mtrack{animation-play-state:paused}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 9px))}}
+.pcard{flex:0 0 340px;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;color:var(--fg);transition:border-color .2s,transform .3s}
+.pcard:hover{text-decoration:none;border-color:var(--accent);transform:translateY(-4px)}
+.pthumb{position:relative;aspect-ratio:16/10;overflow:hidden;background:radial-gradient(circle at 30% 20%,rgba(45,212,191,.28),transparent 60%),radial-gradient(circle at 80% 90%,rgba(56,189,248,.22),transparent 55%),#0d151d;display:flex;align-items:center;justify-content:center}
+.pthumb::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.55),transparent 55%);pointer-events:none}
+.pthumb img{width:100%;height:100%;object-fit:cover;object-position:top;opacity:.85;transition:transform .9s ease-out,opacity .5s}
+.pcard:hover .pthumb img{transform:scale(1.08);opacity:1}
+.pthumb .ph{font-size:17px;font-weight:700;letter-spacing:-.01em;color:#e6edf3;padding:0 28px;text-align:center;line-height:1.35}
+.pcat{position:absolute;top:12px;left:12px;z-index:1;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#e6edf3;background:rgba(11,15,20,.6);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12);padding:4px 10px;border-radius:999px}
+.pbody{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.pbody .tags{margin-top:auto;padding-top:4px;flex-wrap:nowrap;overflow:hidden}
+.pbody h3{font-size:17px;line-height:1.3;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbody p{font-size:14px;line-height:1.55;color:var(--muted);margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media (max-width:760px),(prefers-reduced-motion:reduce){.mtrack{animation:none;width:auto;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 20px;scroll-padding-inline:20px;scrollbar-width:none}.mtrack::-webkit-scrollbar{display:none}.mtrack [aria-hidden="true"]{display:none}.pcard{scroll-snap-align:start}.mrow::before,.mrow::after{display:none}}
+@media (max-width:560px){.pcard{flex-basis:84vw}}
+@media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.feature{grid-template-columns:1fr}.areas{grid-template-columns:repeat(2,1fr)}
 /* Narrow screens: the face would sit under the text, so the overlay goes almost solid. */
 .hero{background-image:linear-gradient(180deg,rgba(11,15,20,.9) 0%,rgba(11,15,20,.93) 55%,rgba(11,15,20,.97) 100%),url("/assets/hero-bg.jpg");background-position:center,72% center}}
-@media (max-width:560px){.grid{grid-template-columns:1fr}nav{gap:12px;font-size:14px}.hero{padding-top:44px}.prose{font-size:17px}}
+@media (max-width:560px){.grid{grid-template-columns:1fr}.areas{grid-template-columns:1fr}nav{gap:12px;font-size:14px}.hero{padding-top:44px}.prose{font-size:17px}}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "ProfilePage", "mainEntity": {"@type": "Person", "name": "Eduard Kharaev", "jobTitle": "Applied AI Engineer", "url": "https://swd07.github.io/", "email": "mailto:haraev87@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Tbilisi", "addressCountry": "GE"}, "sameAs": ["https://github.com/swd07", "https://t.me/Edharaev"], "knowsAbout": ["Applied AI", "Computer Vision", "Vision-Language Models", "Retrieval-Augmented Generation", "Vector Search", "LLM Agents", "MLOps", "Self-hosted LLM inference", "vLLM"]}}</script>
 
@@ -118,17 +143,15 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 <header class="site"><div class="wrap"><a class="mono" href="/" aria-label="Eduard Kharaev home">EK</a><nav><a href="/#writing">Writing</a><a href="/#projects">Projects</a><a href="/#contact">Contact</a></nav></div></header>
 <main>
 <div class="hero"><div class="wrap">
-<span class="eyebrow"><span class="dot"></span>Available for contract work · Tbilisi · remote worldwide</span>
 <h1>Eduard Kharaev</h1>
-<p class="role">Applied AI Engineer · Computer Vision · LLM Agents</p>
-<p class="lead">I build AI systems that run in real business operations and make them reliable enough that people trust the numbers.</p>
-<p class="lead">I built them end to end for a dairy FMCG group: an analytics platform that handles almost all company orders, shelf recognition with computer vision, and LLM agents on self-hosted GPUs.</p>
+<p class="role">Applied AI Engineer · AI Agents · Automation · <span class="nw">AI Solutions Architect</span></p>
+<p class="lead">I design and build AI systems that companies run their daily operations on.</p>
 <div class="btns"><a class="btn primary" href="#contact">Get in touch</a><a class="btn" href="/articles/evidence-not-answers/">Read the article</a><a class="btn" href="https://github.com/swd07">GitHub</a></div>
-<div class="stats">
-<div class="stat"><b>98%</b><span>of company ERP orders went through the platform I built</span></div>
-<div class="stat"><b>95.8%</b><span>brand precision on a production golden set</span></div>
-<div class="stat"><b>~1,500</b><span>retail outlets served by the analytical platform</span></div>
-<div class="stat"><b>H200</b><span>self-hosted Qwen models served with vLLM</span></div>
+<div class="areas">
+<div class="area"><h3>AI Agents</h3><p>Agents that take real actions in business systems, with strict tool limits and human approval.</p><b>11 bounded tools in a live planning app</b></div>
+<div class="area"><h3>Automation</h3><p>Business processes moved onto one AI platform, online and offline.</p><b>100% of company orders</b></div>
+<div class="area"><h3>Analytics &amp; Forecasting</h3><p>BI, demand forecasting and two-way 1C ERP sync.</p><b>BI across 13 business areas, ~1,500 stores</b></div>
+<div class="area"><h3>Computer Vision</h3><p>Product recognition on store shelf photos.</p><b>95.8% brand precision</b></div>
 </div>
 </div></div>
 
@@ -144,24 +167,32 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 </a>
 </div></section>
 
-<section id="projects"><div class="wrap">
+<section id="projects">
+<div class="wrap">
 <h2 class="sec">Projects</h2>
 <p class="sec-sub">Production systems I designed and built. Code is private; each case study covers architecture, decisions and measured results.</p>
-<div class="grid">
-<a class="card" href="/projects/retail-shelf-detection/"><div class="thumb"><img src="/assets/shelf-detection-live.jpg" alt="Retail Shelf Recognition" loading="lazy"></div><div class="body"><h3>Retail Shelf Recognition</h3><p>Production multimodal recognition of products on store shelves: GroundingDINO, Qwen-VL OCR, Qdrant retrieval, DINOv2 and ArcFace, deterministic fusion, guardrails and explicit unknowns.</p><div class="tags"><span class="tag">Computer Vision</span><span class="tag">VLM</span><span class="tag">Retrieval</span><span class="tag">Evaluation</span></div></div></a>
-<a class="card" href="/projects/chaban-platform/"><div class="thumb"><img src="/assets/mobile-field-client.jpg" alt="AI Analytical Platform" loading="lazy"></div><div class="body"><h3>AI Analytical Platform</h3><p>Commercial operating platform for a dairy distributor: offline field sales, two-way 1C ERP, KPI and motivation, 13-area BI, demand forecasting, shelf recognition and AI agents. 98% of company orders flow through it.</p><div class="tags"><span class="tag">Platform</span><span class="tag">ERP</span><span class="tag">BI</span><span class="tag">Forecasting</span><span class="tag">AI Agents</span></div></div></a>
-<a class="card" href="/projects/operations-agent/"><div class="thumb"><img src="/assets/supply-planning-agent.jpg" alt="Supply Planning Action Agent architecture" loading="lazy"></div><div class="body"><h3>Supply Planning Action Agent</h3><p>Supply-planning platform for BOOMi, a beverage brand client, with an embedded self-hosted Qwen agent: 11 bounded tools for planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.</p><div class="tags"><span class="tag">LLM Agents</span><span class="tag">Tool Calling</span><span class="tag">Safety</span></div></div></a>
 </div>
-<h3 class="more-h">More projects</h3>
-<div class="grid2">
-<a class="mini" href="/projects/ai-infrastructure/"><h3>AI Infrastructure Control Plane &amp; MCP Gateway</h3><p>Monitoring for GPU, models and services with AI-specific detectors (LLM endpoint drift, silent OCR degradation), an incident assistant and a least-privilege MCP gateway.</p><div class="tags"><span class="tag">MLOps</span><span class="tag">Observability</span><span class="tag">MCP</span><span class="tag">Security</span></div></a>
-<a class="mini" href="/projects/jarvis/"><h3>Jarvis · Voice Multi-Agent Orchestrator</h3><p>Real-time voice interface over a fleet of agents: WebRTC, agent registry and command queue, role-based capabilities and allowlisted browser actions.</p><div class="tags"><span class="tag">Voice AI</span><span class="tag">Multi-agent</span><span class="tag">Orchestration</span></div></a>
-<a class="mini" href="/projects/merch-terminal/"><h3>Offline Merchandising Terminal</h3><p>Native Android field app (Kotlin, Compose, Room, WorkManager) that captures shelf photos offline and feeds the recognition pipeline without blocking on GPU inference.</p><div class="tags"><span class="tag">Android</span><span class="tag">Offline-first</span><span class="tag">Field capture</span></div></a>
-<a class="mini" href="/projects/delivery-control-plane/"><h3>Internal Developer Platform &amp; Release Orchestration</h3><p>Delivery control plane for multi-environment releases: repository state, selective cherry-pick promotion, conflict handling, dependency preflight, build and health verification.</p><div class="tags"><span class="tag">Platform Engineering</span><span class="tag">Release</span><span class="tag">DevEx</span></div></a>
-<a class="mini" href="/projects/marketing-platform/"><h3>AI Marketing &amp; Brand Growth Platform</h3><p>Marketing intelligence for a consumer beverage brand: Instagram, website and search data in one system, content performance scoring, AI-assisted comment-authenticity checks for influencer vetting (970 candidates → 19 verified) and AI-generated business reports.</p><div class="tags"><span class="tag">Analytics</span><span class="tag">AI Reporting</span><span class="tag">APIs</span><span class="tag">Growth</span></div></a>
-<a class="mini" href="/projects/fitness-platform/"><h3>Fitness Coaching Platform (prototype)</h3><p>Full-stack coach/client prototype on Next.js and Payload CMS with private signed media, RBAC, chat and 204 automated tests including security suites.</p><div class="tags"><span class="tag">Full-stack</span><span class="tag">Security</span><span class="tag">Testing</span></div></a>
+<div class="marquee">
+<div class="mrow left"><div class="mtrack"><a class="pcard" href="/projects/retail-shelf-detection/"><div class="pthumb"><img src="/assets/shelf-detection-live.jpg" alt="Retail Shelf Recognition" loading="lazy"><span class="pcat">Computer Vision</span></div><div class="pbody"><h3>Retail Shelf Recognition</h3><p>Production multimodal recognition of products on store shelves: GroundingDINO, Qwen-VL OCR, Qdrant retrieval, DINOv2 and ArcFace, deterministic fusion, guardrails and explicit unknowns.</p><div class="tags"><span class="tag">Computer Vision</span><span class="tag">VLM</span><span class="tag">Retrieval</span></div></div></a>
+<a class="pcard" href="/projects/chaban-platform/"><div class="pthumb"><img src="/assets/mobile-field-client.jpg" alt="AI Analytical Platform" loading="lazy"><span class="pcat">Platform</span></div><div class="pbody"><h3>AI Analytical Platform</h3><p>Commercial operating platform for a dairy distributor: offline field sales, two-way 1C ERP, KPI and motivation, 13-area BI, demand forecasting, shelf recognition and AI agents. 100% of company orders flow through it.</p><div class="tags"><span class="tag">Platform</span><span class="tag">ERP</span><span class="tag">BI</span></div></div></a>
+<a class="pcard" href="/projects/operations-agent/"><div class="pthumb"><img src="/assets/supply-planning-agent.jpg" alt="Supply Planning Action Agent" loading="lazy"><span class="pcat">AI Agent</span></div><div class="pbody"><h3>Supply Planning Action Agent</h3><p>Supply-planning platform for BOOMi, a beverage brand client, with an embedded self-hosted Qwen agent: 11 bounded tools for planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.</p><div class="tags"><span class="tag">LLM Agents</span><span class="tag">Tool Calling</span><span class="tag">Safety</span></div></div></a>
+<a class="pcard" href="/projects/marketing-platform/"><div class="pthumb"><img src="/assets/marketing-platform-3d-experience.jpg" alt="AI Marketing &amp; Brand Growth Platform" loading="lazy"><span class="pcat">Analytics</span></div><div class="pbody"><h3>AI Marketing &amp; Brand Growth Platform</h3><p>Marketing intelligence for a consumer beverage brand: Instagram, website and search data in one system, content performance scoring, AI-assisted comment-authenticity checks for influencer vetting (970 candidates → 19 verified) and AI-generated business reports.</p><div class="tags"><span class="tag">Analytics</span><span class="tag">AI Reporting</span><span class="tag">APIs</span></div></div></a>
+<a class="pcard" href="/projects/jarvis/"><div class="pthumb"><img src="/assets/jarvis-command-center.jpg" alt="Jarvis · Voice Multi-Agent Orchestrator" loading="lazy"><span class="pcat">Voice AI</span></div><div class="pbody"><h3>Jarvis · Voice Multi-Agent Orchestrator</h3><p>Real-time voice interface over a fleet of agents: WebRTC, agent registry and command queue, role-based capabilities and allowlisted browser actions.</p><div class="tags"><span class="tag">Voice AI</span><span class="tag">Multi-agent</span><span class="tag">Orchestration</span></div></div></a>
+<a class="pcard" href="/projects/retail-shelf-detection/" aria-hidden="true" tabindex="-1"><div class="pthumb"><img src="/assets/shelf-detection-live.jpg" alt="Retail Shelf Recognition" loading="lazy"><span class="pcat">Computer Vision</span></div><div class="pbody"><h3>Retail Shelf Recognition</h3><p>Production multimodal recognition of products on store shelves: GroundingDINO, Qwen-VL OCR, Qdrant retrieval, DINOv2 and ArcFace, deterministic fusion, guardrails and explicit unknowns.</p><div class="tags"><span class="tag">Computer Vision</span><span class="tag">VLM</span><span class="tag">Retrieval</span></div></div></a>
+<a class="pcard" href="/projects/chaban-platform/" aria-hidden="true" tabindex="-1"><div class="pthumb"><img src="/assets/mobile-field-client.jpg" alt="AI Analytical Platform" loading="lazy"><span class="pcat">Platform</span></div><div class="pbody"><h3>AI Analytical Platform</h3><p>Commercial operating platform for a dairy distributor: offline field sales, two-way 1C ERP, KPI and motivation, 13-area BI, demand forecasting, shelf recognition and AI agents. 100% of company orders flow through it.</p><div class="tags"><span class="tag">Platform</span><span class="tag">ERP</span><span class="tag">BI</span></div></div></a>
+<a class="pcard" href="/projects/operations-agent/" aria-hidden="true" tabindex="-1"><div class="pthumb"><img src="/assets/supply-planning-agent.jpg" alt="Supply Planning Action Agent" loading="lazy"><span class="pcat">AI Agent</span></div><div class="pbody"><h3>Supply Planning Action Agent</h3><p>Supply-planning platform for BOOMi, a beverage brand client, with an embedded self-hosted Qwen agent: 11 bounded tools for planning actions and UI navigation, domain resolution before any change, and user identity injected by the server.</p><div class="tags"><span class="tag">LLM Agents</span><span class="tag">Tool Calling</span><span class="tag">Safety</span></div></div></a>
+<a class="pcard" href="/projects/marketing-platform/" aria-hidden="true" tabindex="-1"><div class="pthumb"><img src="/assets/marketing-platform-3d-experience.jpg" alt="AI Marketing &amp; Brand Growth Platform" loading="lazy"><span class="pcat">Analytics</span></div><div class="pbody"><h3>AI Marketing &amp; Brand Growth Platform</h3><p>Marketing intelligence for a consumer beverage brand: Instagram, website and search data in one system, content performance scoring, AI-assisted comment-authenticity checks for influencer vetting (970 candidates → 19 verified) and AI-generated business reports.</p><div class="tags"><span class="tag">Analytics</span><span class="tag">AI Reporting</span><span class="tag">APIs</span></div></div></a>
+<a class="pcard" href="/projects/jarvis/" aria-hidden="true" tabindex="-1"><div class="pthumb"><img src="/assets/jarvis-command-center.jpg" alt="Jarvis · Voice Multi-Agent Orchestrator" loading="lazy"><span class="pcat">Voice AI</span></div><div class="pbody"><h3>Jarvis · Voice Multi-Agent Orchestrator</h3><p>Real-time voice interface over a fleet of agents: WebRTC, agent registry and command queue, role-based capabilities and allowlisted browser actions.</p><div class="tags"><span class="tag">Voice AI</span><span class="tag">Multi-agent</span><span class="tag">Orchestration</span></div></div></a></div></div>
+<div class="mrow right"><div class="mtrack"><a class="pcard" href="/projects/ai-infrastructure/"><div class="pthumb"><div class="ph">AI Infrastructure Control Plane &amp; MCP Gateway</div><span class="pcat">MLOps</span></div><div class="pbody"><h3>AI Infrastructure Control Plane &amp; MCP Gateway</h3><p>Monitoring for GPU, models and services with AI-specific detectors (LLM endpoint drift, silent OCR degradation), an incident assistant and a least-privilege MCP gateway.</p><div class="tags"><span class="tag">MLOps</span><span class="tag">Observability</span><span class="tag">MCP</span></div></div></a>
+<a class="pcard" href="/projects/merch-terminal/"><div class="pthumb"><div class="ph">Offline Merchandising Terminal</div><span class="pcat">Android</span></div><div class="pbody"><h3>Offline Merchandising Terminal</h3><p>Native Android field app (Kotlin, Compose, Room, WorkManager) that captures shelf photos offline and feeds the recognition pipeline without blocking on GPU inference.</p><div class="tags"><span class="tag">Android</span><span class="tag">Offline-first</span><span class="tag">Field capture</span></div></div></a>
+<a class="pcard" href="/projects/delivery-control-plane/"><div class="pthumb"><div class="ph">Internal Developer Platform &amp; Release Orchestration</div><span class="pcat">Platform Engineering</span></div><div class="pbody"><h3>Internal Developer Platform &amp; Release Orchestration</h3><p>Delivery control plane for multi-environment releases: repository state, selective cherry-pick promotion, conflict handling, dependency preflight, build and health verification.</p><div class="tags"><span class="tag">Platform Engineering</span><span class="tag">Release</span><span class="tag">DevEx</span></div></div></a>
+<a class="pcard" href="/projects/fitness-platform/"><div class="pthumb"><div class="ph">Fitness Coaching Platform (prototype)</div><span class="pcat">Full-stack</span></div><div class="pbody"><h3>Fitness Coaching Platform (prototype)</h3><p>Full-stack coach/client prototype on Next.js and Payload CMS with private signed media, RBAC, chat and 204 automated tests including security suites.</p><div class="tags"><span class="tag">Full-stack</span><span class="tag">Security</span><span class="tag">Testing</span></div></div></a>
+<a class="pcard" href="/projects/ai-infrastructure/" aria-hidden="true" tabindex="-1"><div class="pthumb"><div class="ph">AI Infrastructure Control Plane &amp; MCP Gateway</div><span class="pcat">MLOps</span></div><div class="pbody"><h3>AI Infrastructure Control Plane &amp; MCP Gateway</h3><p>Monitoring for GPU, models and services with AI-specific detectors (LLM endpoint drift, silent OCR degradation), an incident assistant and a least-privilege MCP gateway.</p><div class="tags"><span class="tag">MLOps</span><span class="tag">Observability</span><span class="tag">MCP</span></div></div></a>
+<a class="pcard" href="/projects/merch-terminal/" aria-hidden="true" tabindex="-1"><div class="pthumb"><div class="ph">Offline Merchandising Terminal</div><span class="pcat">Android</span></div><div class="pbody"><h3>Offline Merchandising Terminal</h3><p>Native Android field app (Kotlin, Compose, Room, WorkManager) that captures shelf photos offline and feeds the recognition pipeline without blocking on GPU inference.</p><div class="tags"><span class="tag">Android</span><span class="tag">Offline-first</span><span class="tag">Field capture</span></div></div></a>
+<a class="pcard" href="/projects/delivery-control-plane/" aria-hidden="true" tabindex="-1"><div class="pthumb"><div class="ph">Internal Developer Platform &amp; Release Orchestration</div><span class="pcat">Platform Engineering</span></div><div class="pbody"><h3>Internal Developer Platform &amp; Release Orchestration</h3><p>Delivery control plane for multi-environment releases: repository state, selective cherry-pick promotion, conflict handling, dependency preflight, build and health verification.</p><div class="tags"><span class="tag">Platform Engineering</span><span class="tag">Release</span><span class="tag">DevEx</span></div></div></a>
+<a class="pcard" href="/projects/fitness-platform/" aria-hidden="true" tabindex="-1"><div class="pthumb"><div class="ph">Fitness Coaching Platform (prototype)</div><span class="pcat">Full-stack</span></div><div class="pbody"><h3>Fitness Coaching Platform (prototype)</h3><p>Full-stack coach/client prototype on Next.js and Payload CMS with private signed media, RBAC, chat and 204 automated tests including security suites.</p><div class="tags"><span class="tag">Full-stack</span><span class="tag">Security</span><span class="tag">Testing</span></div></div></a></div></div>
 </div>
-</div></section>
+</section>
 
 <section><div class="wrap">
 <h2 class="sec">Skills</h2>
