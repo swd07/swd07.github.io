@@ -108,6 +108,8 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 .mini:hover{text-decoration:none;border-color:var(--accent)}
 .mini h3{font-size:17px;margin:0}
 .mini p{font-size:14.5px;color:var(--muted);margin:0}
+.vframe{position:relative;aspect-ratio:16/9;background:#0b0f14;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.vframe video{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain;background:#0b0f14}
 .marquee{display:flex;flex-direction:column;gap:18px;padding:4px 0}
 .mrow{position:relative;overflow:hidden}
 .mrow::before,.mrow::after{content:"";position:absolute;top:0;bottom:0;width:120px;z-index:2;pointer-events:none}
@@ -154,6 +156,12 @@ img.banner{width:100%;height:auto;border-radius:12px;border:1px solid var(--line
 <div class="area"><h3>Computer Vision</h3><p>Product recognition on store shelf photos.</p><b>95.8% brand precision</b></div>
 </div>
 </div></div>
+
+<section id="latest"><div class="wrap">
+<h2 class="sec">Latest build</h2>
+<p class="sec-sub">PermitGuard: a mobile AI assistant that keeps foreign workers legal, with a live HR platform. Built in one weekend.</p>
+<div class="vframe"><video controls preload="none" playsinline poster="/assets/permitguard-demo.jpg" aria-label="PermitGuard demo video"><source src="/assets/permitguard-demo.mp4" type="video/mp4"></video></div>
+</div></section>
 
 <section id="writing"><div class="wrap">
 <h2 class="sec">Writing</h2>
